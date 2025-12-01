@@ -5,6 +5,9 @@
 
 import Phaser from 'phaser';
 import TouchControls from '../ui/TouchControls.js';
+import Player from '../entities/Player.js';
+import HUD from '../ui/HUD.js';
+import gameState from '../managers/GameState.js';
 
 export default class Level1Scene extends Phaser.Scene {
     constructor() {
@@ -12,54 +15,108 @@ export default class Level1Scene extends Phaser.Scene {
     }
 
     create() {
+        // Resetar estado do jogo para nivel 1
+        if (gameState.currentLevel !== 1) {
+            gameState.reset();
+        }
+        gameState.currentLevel = 1;
+
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
 
         // Fade in
         this.cameras.main.fadeIn(500);
 
-        // Fundo temporario
-        this.add.rectangle(width / 2, height / 2, width, height, 0x2c3e50);
+        // Criar fundo
+        this.createBackground(width, height);
 
-        // Texto placeholder
-        const text = this.add.text(width / 2, height / 2 - 50, 'Nivel 1: Cantina Caotica', {
-            fontSize: '32px',
-            fontFamily: 'Arial',
-            color: '#2ecc71'
+        // Criar plataformas
+        this.createPlatforms(width, height);
+
+        // Criar jogador
+        this.createPlayer();
+
+        // Criar controlos
+        this.createControls();
+
+        // Criar HUD
+        this.hud = new HUD(this);
+
+        // Configurar colisoes
+        this.setupCollisions();
+
+        // Texto de instrucoes (desaparece apos alguns segundos)
+        this.showInstructions(width, height);
+    }
+
+    createBackground(width, height) {
+        // Usar fundo gerado ou fallback
+        if (this.textures.exists('bg-cantina')) {
+            this.add.image(width / 2, height / 2, 'bg-cantina');
+        } else {
+            // Fallback: cor solida
+            this.add.rectangle(width / 2, height / 2, width, height, 0xd7ccc8);
+        }
+    }
+
+    createPlatforms(width, height) {
+        // Grupo estatico de plataformas
+        this.platforms = this.physics.add.staticGroup();
+
+        // Definicao do layout do nivel
+        const platformLayout = [
+            // Chao principal
+            { x: 0, y: height - 16, w: width, h: 32 },
+            // Plataformas flutuantes
+            { x: 150, y: height - 120, w: 128, h: 32 },
+            { x: 400, y: height - 180, w: 192, h: 32 },
+            { x: 650, y: height - 120, w: 128, h: 32 },
+            { x: 300, y: height - 280, w: 128, h: 32 },
+            { x: 550, y: height - 280, w: 128, h: 32 },
+        ];
+
+        // Criar cada plataforma
+        platformLayout.forEach(plat => {
+            this.createPlatform(plat.x, plat.y, plat.w, plat.h);
         });
-        text.setOrigin(0.5);
+    }
 
-        const subtext = this.add.text(width / 2, height / 2 + 10, 'Em construcao...', {
-            fontSize: '18px',
-            fontFamily: 'Arial',
-            color: '#95a5a6'
-        });
-        subtext.setOrigin(0.5);
+    createPlatform(x, y, width, height) {
+        const textureKey = 'platform-brick';
+        const tileWidth = 64;
 
-        // Demo de controlos - quadrado que se move
-        this.demoSquare = this.add.rectangle(width / 2, height / 2 + 80, 40, 40, 0x2ecc71);
+        // Calcular quantos tiles precisamos
+        const tilesX = Math.ceil(width / tileWidth);
 
-        // Instrucao para controlos
-        const controlsText = this.add.text(width / 2, height - 80, 'Usa as setas ou botoes touch para mover', {
-            fontSize: '14px',
-            fontFamily: 'Arial',
-            color: '#95a5a6'
-        });
-        controlsText.setOrigin(0.5);
+        for (let i = 0; i < tilesX; i++) {
+            let platform;
 
-        // Instrucao para avancar
-        const backText = this.add.text(width / 2, height - 50, 'Prima ESPACO ou toca no SALTAR para continuar', {
-            fontSize: '14px',
-            fontFamily: 'Arial',
-            color: '#7f8c8d'
-        });
-        backText.setOrigin(0.5);
+            if (this.textures.exists(textureKey)) {
+                platform = this.add.image(x + i * tileWidth + tileWidth / 2, y, textureKey);
+            } else {
+                // Fallback: retangulo colorido
+                platform = this.add.rectangle(x + i * tileWidth + tileWidth / 2, y, tileWidth, 32, 0xb71c1c);
+            }
 
-        // Criar controlos touch
-        this.touchControls = new TouchControls(this);
+            this.physics.add.existing(platform, true); // true = static
+            this.platforms.add(platform);
+        }
+    }
 
-        // Criar cursores do teclado
+    createPlayer() {
+        const height = this.cameras.main.height;
+
+        // Criar jogador no lado esquerdo
+        this.player = new Player(this, 100, height - 100);
+    }
+
+    createControls() {
+        // Controlos de teclado
         this.cursors = this.input.keyboard.createCursorKeys();
+        this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+        // Controlos touch
+        this.touchControls = new TouchControls(this);
 
         // Evento de resize para reposicionar controlos touch
         this.scale.on('resize', () => {
@@ -69,36 +126,96 @@ export default class Level1Scene extends Phaser.Scene {
         });
     }
 
+    setupCollisions() {
+        // Colisao jogador com plataformas
+        this.physics.add.collider(this.player, this.platforms);
+    }
+
+    showInstructions(width, height) {
+        const instructions = this.add.text(width / 2, height / 2 - 50,
+            '← → para mover\n↑ ou ESPACO para saltar', {
+            fontSize: '16px',
+            fontFamily: 'Arial',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 3,
+            align: 'center'
+        });
+        instructions.setOrigin(0.5);
+        instructions.setAlpha(0.8);
+
+        // Desaparecer apos 3 segundos
+        this.time.delayedCall(3000, () => {
+            this.tweens.add({
+                targets: instructions,
+                alpha: 0,
+                duration: 500,
+                onComplete: () => instructions.destroy()
+            });
+        });
+    }
+
+    /**
+     * Obter estado combinado dos controlos (teclado + touch)
+     */
+    getControls() {
+        // Usar o metodo do TouchControls que combina ambos os inputs
+        return this.touchControls.getState(this.cursors);
+    }
+
     update() {
-        // Obter estado combinado (touch + teclado)
-        const controls = this.touchControls.getState(this.cursors);
+        // Verificar se jogador existe
+        if (!this.player || !this.player.body) return;
 
-        // Mover o quadrado demo
-        if (this.demoSquare) {
-            const speed = 4;
+        // Obter estado combinado dos controlos
+        const controls = this.getControls();
 
-            if (controls.left.isDown) {
-                this.demoSquare.x -= speed;
-            }
-            if (controls.right.isDown) {
-                this.demoSquare.x += speed;
-            }
+        // Atualizar jogador com os controlos
+        this.player.update(controls);
 
-            // Saltar/avancar para proximo nivel
-            if (controls.up.isDown || controls.space.isDown) {
-                this.goToNextLevel();
-            }
+        // Atualizar HUD
+        if (this.hud) {
+            this.hud.update();
+        }
 
-            // Limitar dentro do ecra
-            const width = this.cameras.main.width;
-            this.demoSquare.x = Phaser.Math.Clamp(this.demoSquare.x, 50, width - 50);
+        // Verificar se caiu do mapa
+        if (this.player.y > this.cameras.main.height + 50) {
+            this.handlePlayerFall();
         }
     }
 
+    handlePlayerFall() {
+        // Perder vida
+        const livesLeft = gameState.loseLife();
+
+        if (gameState.isGameOver()) {
+            // Game Over
+            this.cameras.main.fadeOut(500);
+            this.cameras.main.once('camerafadeoutcomplete', () => {
+                this.scene.start('GameOverScene');
+            });
+        } else {
+            // Respawn
+            this.player.reset(100, this.cameras.main.height - 100);
+
+            // Animacao de flash
+            this.cameras.main.flash(500, 255, 0, 0);
+
+            // Atualizar HUD
+            if (this.hud) {
+                this.hud.animateLifeLost(livesLeft);
+            }
+        }
+    }
+
+    /**
+     * Ir para o proximo nivel
+     */
     goToNextLevel() {
-        // Evitar multiplas transicoes
         if (this.transitioning) return;
         this.transitioning = true;
+
+        gameState.nextLevel();
 
         this.cameras.main.fadeOut(500);
         this.cameras.main.once('camerafadeoutcomplete', () => {
