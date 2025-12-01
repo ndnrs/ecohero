@@ -17,6 +17,9 @@ export default class Level1Scene extends Phaser.Scene {
     }
 
     create() {
+        // Resetar flag de transicao
+        this.transitioning = false;
+
         // SEMPRE resetar estado quando entra no nivel 1
         gameState.reset();
         gameState.currentLevel = 1;
@@ -50,6 +53,9 @@ export default class Level1Scene extends Phaser.Scene {
 
         // Configurar colisoes
         this.setupCollisions();
+
+        // Criar porta de saida
+        this.createExit(width, height);
 
         // Texto de instrucoes (desaparece apos alguns segundos)
         this.showInstructions(width, height);
@@ -160,6 +166,23 @@ export default class Level1Scene extends Phaser.Scene {
     setupCollisions() {
         // Colisao jogador com plataformas
         this.physics.add.collider(this.player, this.platforms);
+    }
+
+    createExit(width, height) {
+        // Porta de saida na plataforma do lado direito superior
+        this.exit = this.add.rectangle(width - 60, height - 310, 40, 50, 0x2ecc71);
+        this.exit.setStrokeStyle(3, 0x27ae60);
+        this.physics.add.existing(this.exit, true);
+
+        // Texto indicativo
+        this.add.text(width - 60, height - 340, 'SAIDA', {
+            fontSize: '12px',
+            fontFamily: 'Arial',
+            color: '#ffffff'
+        }).setOrigin(0.5);
+
+        // Colisao com saida
+        this.physics.add.overlap(this.player, this.exit, () => this.goToNextLevel());
     }
 
     showInstructions(width, height) {
