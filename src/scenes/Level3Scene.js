@@ -10,6 +10,7 @@ import Player from '../entities/Player.js';
 import HUD from '../ui/HUD.js';
 import Boss from '../entities/Boss.js';
 import gameState from '../managers/GameState.js';
+import audioManager from '../managers/AudioManager.js';
 
 export default class Level3Scene extends Phaser.Scene {
     constructor() {
@@ -98,6 +99,15 @@ export default class Level3Scene extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.touchControls = new TouchControls(this);
         this.scale.on('resize', () => this.touchControls?.resize());
+
+        // Tecla de pausa (P ou ESC)
+        this.input.keyboard.on('keydown-P', () => this.pauseGame());
+        this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
+    }
+
+    pauseGame() {
+        this.scene.pause();
+        this.scene.launch('PauseScene', { pausedScene: 'Level3Scene' });
     }
 
     createBoss(width, height) {
@@ -268,11 +278,19 @@ export default class Level3Scene extends Phaser.Scene {
     handleCollectItem(player, item) {
         if (!item || !item.active) return;
 
+        // Som de coleta
+        audioManager.playCollect();
+
         // Pontos
         const points = item.points || 10;
         const result = gameState.addScore(points);
         gameState.collectItem();
         this.itemsCollectedThisLevel++;
+
+        // Som de combo se aplicavel
+        if (result.multiplier > 1) {
+            audioManager.playCombo(result.multiplier);
+        }
 
         // Efeito visual de coleta
         this.showCollectEffect(item.x, item.y, result.points, result.multiplier);

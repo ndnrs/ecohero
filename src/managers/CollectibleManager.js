@@ -4,6 +4,7 @@
 
 import Collectible from '../entities/Collectible.js';
 import gameState from './GameState.js';
+import audioManager from './AudioManager.js';
 
 export default class CollectibleManager {
     constructor(scene) {
@@ -135,9 +136,17 @@ export default class CollectibleManager {
         const points = item.collect();
 
         if (points) {
+            // Som de coleta
+            audioManager.playCollect();
+
             // Adicionar pontos
             const result = gameState.addScore(points);
             gameState.collectItem();
+
+            // Som de combo se aplicavel
+            if (result.multiplier > 1) {
+                audioManager.playCombo(result.multiplier);
+            }
 
             // Mostrar pontos flutuantes
             if (this.scene.hud) {

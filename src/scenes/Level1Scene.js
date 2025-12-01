@@ -136,6 +136,15 @@ export default class Level1Scene extends Phaser.Scene {
                 this.touchControls.resize();
             }
         });
+
+        // Tecla de pausa (P ou ESC)
+        this.input.keyboard.on('keydown-P', () => this.pauseGame());
+        this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
+    }
+
+    pauseGame() {
+        this.scene.pause();
+        this.scene.launch('PauseScene', { pausedScene: 'Level1Scene' });
     }
 
     createCollectibles() {

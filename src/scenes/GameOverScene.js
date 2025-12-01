@@ -5,6 +5,7 @@
 
 import Phaser from 'phaser';
 import gameState from '../managers/GameState.js';
+import audioManager from '../managers/AudioManager.js';
 
 export default class GameOverScene extends Phaser.Scene {
     constructor() {
@@ -17,6 +18,9 @@ export default class GameOverScene extends Phaser.Scene {
 
         // Obter dados do jogo
         const data = gameState.getEndScreenData();
+
+        // Som de morte
+        audioManager.playDeath();
 
         // Fade in
         this.cameras.main.fadeIn(500);
@@ -308,6 +312,7 @@ export default class GameOverScene extends Phaser.Scene {
         button.on('pointerup', () => {
             button.setScale(1);
             buttonText.setScale(1);
+            audioManager.playClick();
             callback();
         });
     }

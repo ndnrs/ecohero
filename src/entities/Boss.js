@@ -7,6 +7,7 @@
 
 import Phaser from 'phaser';
 import gameState from '../managers/GameState.js';
+import audioManager from '../managers/AudioManager.js';
 
 export default class Boss extends Phaser.GameObjects.Container {
     constructor(scene, x, y) {
@@ -323,6 +324,9 @@ export default class Boss extends Phaser.GameObjects.Container {
         this.isInvincible = true;
         this.health--;
 
+        // Som de boss hit
+        audioManager.playBossHit();
+
         // Atualizar fase
         this.updatePhase();
 
@@ -464,6 +468,9 @@ export default class Boss extends Phaser.GameObjects.Container {
 
     defeat() {
         this.isDefeated = true;
+
+        // Som de derrota do boss
+        audioManager.playBossDefeat();
 
         // Parar timers
         if (this.attackTimer) this.attackTimer.destroy();

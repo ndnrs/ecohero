@@ -4,6 +4,7 @@
  */
 
 import Phaser from 'phaser';
+import audioManager from '../managers/AudioManager.js';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
@@ -111,6 +112,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setVelocityY(this.jumpForce);
             this.isJumping = true;
 
+            // Som de salto
+            audioManager.playJump();
+
             // Efeito de particulas ao saltar
             this.emitJumpParticles();
         }
@@ -119,6 +123,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (jumpPressed && !onGround && this.canDoubleJump && this.body.velocity.y > 0) {
             this.setVelocityY(this.jumpForce * 0.8);
             this.canDoubleJump = false;
+            audioManager.playJump();
             this.emitJumpParticles();
         }
     }
@@ -163,6 +168,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
      * A verificacao de invencibilidade e feita no EnemyManager
      */
     hit() {
+        // Som de dano
+        audioManager.playHit();
+
         // Efeito de knockback
         const knockbackDir = this.facingRight ? -1 : 1;
         this.setVelocityX(knockbackDir * 150);
@@ -197,6 +205,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
      * Jogador morre
      */
     die() {
+        // Som de morte
+        audioManager.playDeath();
+
         // Desativar fisica
         this.body.enable = false;
 

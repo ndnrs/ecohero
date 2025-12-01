@@ -12,6 +12,7 @@ import Level2Scene from './scenes/Level2Scene.js';
 import Level3Scene from './scenes/Level3Scene.js';
 import GameOverScene from './scenes/GameOverScene.js';
 import VictoryScene from './scenes/VictoryScene.js';
+import PauseScene from './scenes/PauseScene.js';
 
 // Configuracao do jogo Phaser
 const config = {
@@ -43,7 +44,8 @@ const config = {
         Level2Scene,
         Level3Scene,
         GameOverScene,
-        VictoryScene
+        VictoryScene,
+        PauseScene
     ],
 
     // Configuracoes de escala para responsividade

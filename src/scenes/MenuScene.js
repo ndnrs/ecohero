@@ -4,6 +4,7 @@
  */
 
 import Phaser from 'phaser';
+import audioManager from '../managers/AudioManager.js';
 
 export default class MenuScene extends Phaser.Scene {
     constructor() {
@@ -144,6 +145,10 @@ export default class MenuScene extends Phaser.Scene {
         });
 
         buttonBg.on('pointerup', () => {
+            // Inicializar e tocar audio
+            audioManager.init();
+            audioManager.playGameStart();
+
             // Transicao para o primeiro nivel
             this.cameras.main.fadeOut(500, 0, 0, 0);
             this.cameras.main.once('camerafadeoutcomplete', () => {
