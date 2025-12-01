@@ -50,6 +50,11 @@ const config = {
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+
+    // Suporte para multi-touch (importante para controlos mobile)
+    input: {
+        activePointers: 3 // Permite 3 toques simultaneos
     }
 };
 

@@ -4,6 +4,7 @@
  */
 
 import Phaser from 'phaser';
+import TouchControls from '../ui/TouchControls.js';
 
 export default class Level2Scene extends Phaser.Scene {
     constructor() {
@@ -35,24 +36,65 @@ export default class Level2Scene extends Phaser.Scene {
         });
         subtext.setOrigin(0.5);
 
+        // Demo de controlos - quadrado que se move
+        this.demoSquare = this.add.rectangle(width / 2, height / 2 + 80, 40, 40, 0x27ae60);
+
         // Instrucao para avancar
-        const nextText = this.add.text(width / 2, height - 50, 'Prima ESPACO para continuar', {
+        const nextText = this.add.text(width / 2, height - 50, 'Prima ESPACO ou SALTAR para continuar', {
             fontSize: '14px',
             fontFamily: 'Arial',
             color: '#7f8c8d'
         });
         nextText.setOrigin(0.5);
 
-        // Input para avancar
-        this.input.keyboard.once('keydown-SPACE', () => {
-            this.cameras.main.fadeOut(500);
-            this.cameras.main.once('camerafadeoutcomplete', () => {
-                this.scene.start('Level3Scene');
-            });
+        // Criar controlos touch
+        this.touchControls = new TouchControls(this);
+
+        // Criar cursores do teclado
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        // Evento de resize
+        this.scale.on('resize', () => {
+            if (this.touchControls) {
+                this.touchControls.resize();
+            }
         });
     }
 
     update() {
-        // Logica de update sera implementada nas proximas fases
+        // Obter estado combinado (touch + teclado)
+        const controls = this.touchControls.getState(this.cursors);
+
+        // Mover o quadrado demo
+        if (this.demoSquare) {
+            const speed = 4;
+
+            if (controls.left.isDown) {
+                this.demoSquare.x -= speed;
+            }
+            if (controls.right.isDown) {
+                this.demoSquare.x += speed;
+            }
+
+            // Saltar/avancar para proximo nivel
+            if (controls.up.isDown || controls.space.isDown) {
+                this.goToNextLevel();
+            }
+
+            // Limitar dentro do ecra
+            const width = this.cameras.main.width;
+            this.demoSquare.x = Phaser.Math.Clamp(this.demoSquare.x, 50, width - 50);
+        }
+    }
+
+    goToNextLevel() {
+        // Evitar multiplas transicoes
+        if (this.transitioning) return;
+        this.transitioning = true;
+
+        this.cameras.main.fadeOut(500);
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+            this.scene.start('Level3Scene');
+        });
     }
 }

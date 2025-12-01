@@ -4,6 +4,7 @@
  */
 
 import Phaser from 'phaser';
+import TouchControls from '../ui/TouchControls.js';
 
 export default class Level3Scene extends Phaser.Scene {
     constructor() {
@@ -44,31 +45,88 @@ export default class Level3Scene extends Phaser.Scene {
         });
         subtext.setOrigin(0.5);
 
+        // Demo de controlos - quadrado que se move
+        this.demoSquare = this.add.rectangle(width / 2, height / 2 + 100, 40, 40, 0xf1c40f);
+
         // Instrucao
-        const nextText = this.add.text(width / 2, height - 50, 'Prima V para vitoria, G para game over', {
+        const nextText = this.add.text(width / 2, height - 50, 'SALTAR=Vitoria | Duplo-tap centro=Game Over', {
             fontSize: '14px',
             fontFamily: 'Arial',
             color: '#ecf0f1'
         });
         nextText.setOrigin(0.5);
 
-        // Inputs para testar cenas finais
-        this.input.keyboard.once('keydown-V', () => {
-            this.cameras.main.fadeOut(500);
-            this.cameras.main.once('camerafadeoutcomplete', () => {
-                this.scene.start('VictoryScene');
-            });
+        // Criar controlos touch
+        this.touchControls = new TouchControls(this);
+
+        // Criar cursores do teclado
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        // Evento de resize
+        this.scale.on('resize', () => {
+            if (this.touchControls) {
+                this.touchControls.resize();
+            }
         });
 
-        this.input.keyboard.once('keydown-G', () => {
-            this.cameras.main.fadeOut(500);
-            this.cameras.main.once('camerafadeoutcomplete', () => {
-                this.scene.start('GameOverScene');
-            });
+        // Input para game over (tecla G ou tap no centro)
+        this.input.keyboard.on('keydown-G', () => {
+            this.goToGameOver();
+        });
+
+        // Zona central para game over (touch)
+        const centerZone = this.add.zone(width / 2, height / 2, 200, 200);
+        centerZone.setInteractive();
+        centerZone.on('pointerdown', () => {
+            this.goToGameOver();
         });
     }
 
     update() {
-        // Logica de update e boss fight sera implementada nas proximas fases
+        // Obter estado combinado (touch + teclado)
+        const controls = this.touchControls.getState(this.cursors);
+
+        // Mover o quadrado demo
+        if (this.demoSquare) {
+            const speed = 4;
+
+            if (controls.left.isDown) {
+                this.demoSquare.x -= speed;
+            }
+            if (controls.right.isDown) {
+                this.demoSquare.x += speed;
+            }
+
+            // Saltar = Vitoria
+            if (controls.up.isDown || controls.space.isDown) {
+                this.goToVictory();
+            }
+
+            // Limitar dentro do ecra
+            const width = this.cameras.main.width;
+            this.demoSquare.x = Phaser.Math.Clamp(this.demoSquare.x, 50, width - 50);
+        }
+    }
+
+    goToVictory() {
+        // Evitar multiplas transicoes
+        if (this.transitioning) return;
+        this.transitioning = true;
+
+        this.cameras.main.fadeOut(500);
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+            this.scene.start('VictoryScene');
+        });
+    }
+
+    goToGameOver() {
+        // Evitar multiplas transicoes
+        if (this.transitioning) return;
+        this.transitioning = true;
+
+        this.cameras.main.fadeOut(500);
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+            this.scene.start('GameOverScene');
+        });
     }
 }
