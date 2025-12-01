@@ -9,6 +9,7 @@ import Player from '../entities/Player.js';
 import HUD from '../ui/HUD.js';
 import gameState from '../managers/GameState.js';
 import CollectibleManager from '../managers/CollectibleManager.js';
+import EnemyManager from '../managers/EnemyManager.js';
 
 export default class Level1Scene extends Phaser.Scene {
     constructor() {
@@ -45,6 +46,9 @@ export default class Level1Scene extends Phaser.Scene {
 
         // Criar coletaveis
         this.createCollectibles();
+
+        // Criar inimigos
+        this.createEnemies();
 
         // Configurar colisoes
         this.setupCollisions();
@@ -144,6 +148,17 @@ export default class Level1Scene extends Phaser.Scene {
         );
     }
 
+    createEnemies() {
+        // Criar manager de inimigos
+        this.enemyManager = new EnemyManager(this);
+
+        // Criar layout do nivel 1
+        this.enemyManager.createLevelLayout(1);
+
+        // Configurar colisoes
+        this.enemyManager.setupCollision(this.player, this.platforms);
+    }
+
     setupCollisions() {
         // Colisao jogador com plataformas
         this.physics.add.collider(this.player, this.platforms);
@@ -194,6 +209,11 @@ export default class Level1Scene extends Phaser.Scene {
         // Atualizar HUD
         if (this.hud) {
             this.hud.update();
+        }
+
+        // Atualizar inimigos
+        if (this.enemyManager) {
+            this.enemyManager.update();
         }
 
         // Verificar se caiu do mapa

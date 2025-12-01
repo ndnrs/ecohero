@@ -18,7 +18,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Propriedades de movimento
         this.speed = 200;
-        this.jumpForce = -380;
+        this.jumpForce = -480; // Aumentado para alcançar plataformas
 
         // Estado do jogador
         this.isJumping = false;
