@@ -92,26 +92,32 @@ export default class EnemyManager {
     }
 
     handleCollision(player, enemy) {
+        // Verificar se jogador esta invencivel
         if (player.isInvincible) return;
 
-        const damageApplied = enemy.hitPlayer(player);
+        // Marcar como invencivel ANTES de processar dano
+        player.isInvincible = true;
 
-        if (damageApplied) {
-            const livesLeft = gameState.loseLife();
-            gameState.resetCombo();
+        // Aplicar efeitos visuais de dano
+        enemy.hitPlayer(player);
 
-            if (this.scene.hud) {
-                this.scene.hud.animateLifeLost(livesLeft);
-            }
+        // Perder vida
+        const livesLeft = gameState.loseLife();
+        gameState.resetCombo();
 
-            if (gameState.isGameOver()) {
-                this.scene.time.delayedCall(500, () => {
-                    this.scene.cameras.main.fadeOut(500);
-                    this.scene.cameras.main.once('camerafadeoutcomplete', () => {
-                        this.scene.scene.start('GameOverScene');
-                    });
+        // Atualizar HUD
+        if (this.scene.hud) {
+            this.scene.hud.animateLifeLost(livesLeft);
+        }
+
+        // Verificar game over
+        if (gameState.isGameOver()) {
+            this.scene.time.delayedCall(500, () => {
+                this.scene.cameras.main.fadeOut(500);
+                this.scene.cameras.main.once('camerafadeoutcomplete', () => {
+                    this.scene.scene.start('GameOverScene');
                 });
-            }
+            });
         }
     }
 

@@ -17,10 +17,8 @@ export default class Level1Scene extends Phaser.Scene {
     }
 
     create() {
-        // Resetar estado do jogo para nivel 1
-        if (gameState.currentLevel !== 1) {
-            gameState.reset();
-        }
+        // SEMPRE resetar estado quando entra no nivel 1
+        gameState.reset();
         gameState.currentLevel = 1;
 
         const width = this.cameras.main.width;

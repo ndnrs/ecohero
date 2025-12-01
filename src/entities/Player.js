@@ -159,27 +159,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     /**
-     * Jogador leva dano
+     * Jogador leva dano - apenas efeitos visuais
+     * A verificacao de invencibilidade e feita no EnemyManager
      */
     hit() {
-        // Ignorar se invencivel
-        if (this.isInvincible) return false;
-
-        // Ativar invencibilidade
-        this.isInvincible = true;
-
         // Efeito de knockback
         const knockbackDir = this.facingRight ? -1 : 1;
         this.setVelocityX(knockbackDir * 150);
         this.setVelocityY(-200);
 
-        // Efeito de piscar
+        // Efeito de piscar (1.5 segundos de invencibilidade)
         this.scene.tweens.add({
             targets: this,
             alpha: 0.3,
             duration: 100,
             yoyo: true,
-            repeat: 8,
+            repeat: 10,
             onComplete: () => {
                 this.isInvincible = false;
                 this.alpha = 1;
@@ -195,7 +190,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.clearTint();
         });
 
-        return true; // Dano aplicado
+        return true;
     }
 
     /**
