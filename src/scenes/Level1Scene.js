@@ -8,6 +8,7 @@ import TouchControls from '../ui/TouchControls.js';
 import Player from '../entities/Player.js';
 import HUD from '../ui/HUD.js';
 import gameState from '../managers/GameState.js';
+import CollectibleManager from '../managers/CollectibleManager.js';
 
 export default class Level1Scene extends Phaser.Scene {
     constructor() {
@@ -41,6 +42,9 @@ export default class Level1Scene extends Phaser.Scene {
 
         // Criar HUD
         this.hud = new HUD(this);
+
+        // Criar coletaveis
+        this.createCollectibles();
 
         // Configurar colisoes
         this.setupCollisions();
@@ -124,6 +128,20 @@ export default class Level1Scene extends Phaser.Scene {
                 this.touchControls.resize();
             }
         });
+    }
+
+    createCollectibles() {
+        // Criar manager de coletaveis
+        this.collectibleManager = new CollectibleManager(this);
+
+        // Criar layout do nivel 1
+        this.collectibleManager.createLevelLayout(1);
+
+        // Configurar colisao com jogador
+        this.collectibleManager.setupCollision(
+            this.player,
+            (player, item) => this.collectibleManager.handleCollect(player, item)
+        );
     }
 
     setupCollisions() {
