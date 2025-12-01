@@ -1,12 +1,14 @@
 /**
  * Level3Scene - Nivel 3: Telhado Solar - Boss Final
  * Nivel final com confronto contra Doutor Plastico
+ * Mecanica: Boss atira lixo -> lixo vira coletavel -> apanhar causa dano ao boss
  */
 
 import Phaser from 'phaser';
 import TouchControls from '../ui/TouchControls.js';
 import Player from '../entities/Player.js';
 import HUD from '../ui/HUD.js';
+import Boss from '../entities/Boss.js';
 import gameState from '../managers/GameState.js';
 
 export default class Level3Scene extends Phaser.Scene {
@@ -20,6 +22,10 @@ export default class Level3Scene extends Phaser.Scene {
 
         gameState.currentLevel = 3;
 
+        // Definir total de itens para este nivel (boss = 10 itens necessarios)
+        gameState.setTotalItems(10);
+        this.itemsCollectedThisLevel = 0;
+
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
 
@@ -31,7 +37,7 @@ export default class Level3Scene extends Phaser.Scene {
         this.createControls();
         this.hud = new HUD(this);
         this.createBoss(width, height);
-        this.createProjectiles();
+        this.createGroups();
         this.setupCollisions();
 
         // Texto de instrucao inicial
@@ -52,17 +58,19 @@ export default class Level3Scene extends Phaser.Scene {
     createPlatforms(width, height) {
         this.platforms = this.physics.add.staticGroup();
 
-        // Layout especial para boss fight - arena
+        // Layout especial para boss fight - arena aberta
         const layout = [
-            // Chao principal
-            { x: 0, y: height - 16, w: 800, h: 32 },
-            // Plataformas para saltar e evitar ataques
-            { x: 50, y: height - 100, w: 100, h: 32 },
-            { x: 200, y: height - 150, w: 100, h: 32 },
-            { x: 400, y: height - 120, w: 150, h: 32 },
-            { x: 600, y: height - 160, w: 100, h: 32 },
-            // Plataforma elevada para atacar o boss
-            { x: 300, y: height - 250, w: 200, h: 32 },
+            // Chao principal com gap no meio para perigo
+            { x: 0, y: height - 16, w: 300, h: 32 },
+            { x: 500, y: height - 16, w: 300, h: 32 },
+            // Plataformas laterais
+            { x: 50, y: height - 120, w: 120, h: 32 },
+            { x: 630, y: height - 120, w: 120, h: 32 },
+            // Plataformas medias
+            { x: 200, y: height - 200, w: 150, h: 32 },
+            { x: 450, y: height - 200, w: 150, h: 32 },
+            // Plataforma central alta
+            { x: 300, y: height - 300, w: 200, h: 32 },
         ];
 
         layout.forEach(p => this.createPlatform(p.x, p.y, p.w));
@@ -93,167 +101,145 @@ export default class Level3Scene extends Phaser.Scene {
     }
 
     createBoss(width, height) {
-        this.bossHealth = 5;
-        this.bossMaxHealth = 5;
-        this.bossInvincible = false;
-        this.bossAttacking = false;
-        this.bossDefeated = false;
+        // Criar boss no topo central
+        this.boss = new Boss(this, width / 2, 80);
 
-        // Criar sprite do boss
-        const bossX = width - 100;
-        const bossY = height - 80;
-
-        if (this.textures.exists('boss-idle')) {
-            this.boss = this.physics.add.sprite(bossX, bossY, 'boss-idle');
-        } else {
-            // Fallback: criar boss como rectangle
-            this.boss = this.add.rectangle(bossX, bossY, 80, 100, 0x8e44ad);
-            this.physics.add.existing(this.boss);
-        }
-
-        this.boss.body.setImmovable(true);
-        this.boss.body.allowGravity = false;
-
-        // Barra de vida do boss
+        // Criar barra de vida do boss
         this.createBossHealthBar(width);
 
         // Nome do boss
-        this.bossNameText = this.add.text(width / 2, 30, 'DOUTOR PLASTICO', {
-            fontSize: '20px',
+        this.bossNameText = this.add.text(width / 2, 15, 'DOUTOR PLASTICO', {
+            fontSize: '18px',
             fontFamily: 'Arial',
             color: '#e74c3c',
-            fontStyle: 'bold'
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 2
         }).setOrigin(0.5);
 
-        // Iniciar comportamento do boss
-        this.time.delayedCall(3000, () => this.startBossBehavior());
+        // Iniciar comportamento do boss apos intro
+        this.time.delayedCall(3500, () => {
+            if (this.boss && !this.boss.isDefeated) {
+                this.boss.startBehavior();
+            }
+        });
     }
 
     createBossHealthBar(width) {
-        const barWidth = 200;
-        const barHeight = 16;
-        const x = width / 2 - barWidth / 2;
-        const y = 50;
+        const barWidth = 250;
+        const barHeight = 18;
+        const x = width / 2;
+        const y = 38;
 
         // Fundo da barra
-        this.bossHealthBg = this.add.rectangle(x + barWidth / 2, y, barWidth, barHeight, 0x2c3e50);
+        this.bossHealthBg = this.add.rectangle(x, y, barWidth, barHeight, 0x2c3e50);
         this.bossHealthBg.setStrokeStyle(2, 0xecf0f1);
 
-        // Barra de vida
-        this.bossHealthBar = this.add.rectangle(x + barWidth / 2, y, barWidth - 4, barHeight - 4, 0xe74c3c);
+        // Barra de vida (comeca verde)
+        this.bossHealthBar = this.add.rectangle(x, y, barWidth - 4, barHeight - 4, 0x2ecc71);
+
+        // Texto de HP
+        this.bossHPText = this.add.text(x, y, '10/10', {
+            fontSize: '12px',
+            fontFamily: 'Arial',
+            color: '#ffffff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
     }
 
     updateBossHealthBar() {
-        const percent = this.bossHealth / this.bossMaxHealth;
-        const barWidth = 196;
-        this.bossHealthBar.width = barWidth * percent;
+        if (!this.boss) return;
+
+        const percent = this.boss.getHealthPercent();
+        const maxWidth = 246;
+        this.bossHealthBar.width = maxWidth * percent;
 
         // Mudar cor conforme a vida
         if (percent <= 0.3) {
-            this.bossHealthBar.fillColor = 0xc0392b;
+            this.bossHealthBar.fillColor = 0xe74c3c; // Vermelho
         } else if (percent <= 0.6) {
-            this.bossHealthBar.fillColor = 0xe67e22;
+            this.bossHealthBar.fillColor = 0xf39c12; // Laranja
+        } else {
+            this.bossHealthBar.fillColor = 0x2ecc71; // Verde
         }
+
+        // Atualizar texto
+        this.bossHPText.setText(`${this.boss.health}/${this.boss.maxHealth}`);
+
+        // Animacao de shake na barra
+        this.tweens.add({
+            targets: [this.bossHealthBar, this.bossHealthBg],
+            scaleX: 1.05,
+            duration: 50,
+            yoyo: true,
+            repeat: 2
+        });
     }
 
-    createProjectiles() {
-        this.projectiles = this.physics.add.group();
+    createGroups() {
+        // Grupo para projeteis do boss
+        this.trashProjectiles = this.physics.add.group();
+
+        // Grupo para coletaveis gerados pelo boss
+        this.bossCollectibles = this.physics.add.group();
     }
 
     showBossIntro(width, height) {
-        const introText = this.add.text(width / 2, height / 2 - 50,
+        // Escurecer um pouco
+        const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.5);
+
+        const introText = this.add.text(width / 2, height / 2 - 60,
             'ALERTA!\nDoutor Plastico apareceu!', {
             fontSize: '28px',
             fontFamily: 'Arial',
             color: '#e74c3c',
             align: 'center',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 3
+        }).setOrigin(0.5);
+
+        const tipText = this.add.text(width / 2, height / 2 + 20,
+            'Apanha o lixo que ele atira!\nCada item apanhado causa dano!', {
+            fontSize: '16px',
+            fontFamily: 'Arial',
+            color: '#f1c40f',
+            align: 'center'
+        }).setOrigin(0.5);
+
+        const carlaText = this.add.text(width / 2, height / 2 + 70,
+            'Vamos Carla! Tu consegues! 💪', {
+            fontSize: '18px',
+            fontFamily: 'Arial',
+            color: '#2ecc71',
             fontStyle: 'bold'
         }).setOrigin(0.5);
 
-        const tipText = this.add.text(width / 2, height / 2 + 30,
-            'Salta na cabeca dele para atacar!', {
-            fontSize: '16px',
-            fontFamily: 'Arial',
-            color: '#f1c40f'
-        }).setOrigin(0.5);
-
-        // Fade out apos 2.5 segundos
-        this.time.delayedCall(2500, () => {
+        // Animacao de entrada
+        [introText, tipText, carlaText].forEach((text, i) => {
+            text.setScale(0);
             this.tweens.add({
-                targets: [introText, tipText],
+                targets: text,
+                scale: 1,
+                duration: 300,
+                delay: i * 200,
+                ease: 'Back.easeOut'
+            });
+        });
+
+        // Fade out apos 3 segundos
+        this.time.delayedCall(3000, () => {
+            this.tweens.add({
+                targets: [overlay, introText, tipText, carlaText],
                 alpha: 0,
                 duration: 500,
                 onComplete: () => {
+                    overlay.destroy();
                     introText.destroy();
                     tipText.destroy();
+                    carlaText.destroy();
                 }
             });
-        });
-    }
-
-    startBossBehavior() {
-        if (this.bossDefeated) return;
-
-        // Ciclo de ataque do boss
-        this.bossAttackTimer = this.time.addEvent({
-            delay: 2000,
-            callback: () => this.bossAttack(),
-            loop: true
-        });
-
-        // Movimento do boss
-        this.bossMoveTimer = this.time.addEvent({
-            delay: 3000,
-            callback: () => this.bossMove(),
-            loop: true
-        });
-    }
-
-    bossAttack() {
-        if (this.bossDefeated || !this.boss || !this.player) return;
-
-        this.bossAttacking = true;
-
-        // Flash vermelho no boss
-        if (this.boss.setTint) {
-            this.boss.setTint(0xff0000);
-            this.time.delayedCall(200, () => this.boss?.clearTint?.());
-        }
-
-        // Lancar projectil na direcao do jogador
-        const projectile = this.add.circle(this.boss.x - 40, this.boss.y, 15, 0x9b59b6);
-        this.physics.add.existing(projectile);
-        this.projectiles.add(projectile);
-
-        // Calcular direcao para o jogador
-        const angle = Phaser.Math.Angle.Between(
-            projectile.x, projectile.y,
-            this.player.x, this.player.y
-        );
-
-        const speed = 200;
-        projectile.body.setVelocity(
-            Math.cos(angle) * speed,
-            Math.sin(angle) * speed
-        );
-
-        // Destruir projectil apos 4 segundos
-        this.time.delayedCall(4000, () => projectile?.destroy?.());
-
-        this.bossAttacking = false;
-    }
-
-    bossMove() {
-        if (this.bossDefeated || !this.boss) return;
-
-        const width = this.cameras.main.width;
-        const targetX = Phaser.Math.Between(width / 2, width - 60);
-
-        this.tweens.add({
-            targets: this.boss,
-            x: targetX,
-            duration: 1000,
-            ease: 'Power2'
         });
     }
 
@@ -261,146 +247,142 @@ export default class Level3Scene extends Phaser.Scene {
         // Player com plataformas
         this.physics.add.collider(this.player, this.platforms);
 
-        // Player com boss (para saltar em cima)
-        this.physics.add.overlap(this.player, this.boss, (player, boss) => {
-            this.handleBossCollision(player, boss);
+        // Player com projeteis do boss (dano)
+        this.physics.add.overlap(this.player, this.trashProjectiles, (player, trash) => {
+            this.handleTrashHit(player, trash);
         });
 
-        // Player com projecteis
-        this.physics.add.overlap(this.player, this.projectiles, (player, projectile) => {
-            this.handleProjectileHit(player, projectile);
+        // Player com coletaveis (apanhar e causar dano ao boss)
+        this.physics.add.overlap(this.player, this.bossCollectibles, (player, item) => {
+            this.handleCollectItem(player, item);
         });
     }
 
-    handleBossCollision(player, boss) {
-        if (this.bossDefeated || this.bossInvincible) return;
+    handleTrashHit(player, trash) {
+        if (player.isInvincible) return;
 
-        // Verificar se o jogador está a cair em cima do boss
-        const playerBottom = player.y + player.body.height / 2;
-        const bossTop = boss.y - (boss.body ? boss.body.height / 2 : 50);
-        const isFalling = player.body.velocity.y > 0;
+        trash.destroy();
+        this.handlePlayerDamage();
+    }
 
-        if (isFalling && playerBottom < boss.y) {
-            // Atacou o boss!
-            this.hitBoss();
-            // Bounce do jogador
-            player.body.setVelocityY(-300);
-        } else if (!player.isInvincible) {
-            // Tocou no boss lateralmente - toma dano
-            this.handlePlayerDamage();
+    handleCollectItem(player, item) {
+        if (!item || !item.active) return;
+
+        // Pontos
+        const points = item.points || 10;
+        const result = gameState.addScore(points);
+        gameState.collectItem();
+        this.itemsCollectedThisLevel++;
+
+        // Efeito visual de coleta
+        this.showCollectEffect(item.x, item.y, result.points, result.multiplier);
+
+        // Destruir item
+        item.destroy();
+
+        // Causar dano ao boss
+        if (this.boss && !this.boss.isDefeated) {
+            const defeated = this.boss.takeDamage();
+            this.updateBossHealthBar();
+
+            if (defeated) {
+                this.handleBossDefeated();
+            }
+        }
+
+        // Mensagem motivacional ocasional
+        if (Math.random() < 0.3) {
+            this.showMotivationalMessage();
         }
     }
 
-    hitBoss() {
-        this.bossInvincible = true;
-        this.bossHealth--;
+    showCollectEffect(x, y, points, multiplier) {
+        // Texto de pontos
+        const pointText = multiplier > 1 ?
+            `+${points} x${multiplier}!` :
+            `+${points}`;
 
-        // Atualizar barra de vida
-        this.updateBossHealthBar();
-
-        // Efeito de dano
-        if (this.boss.setTint) {
-            this.boss.setTint(0xffffff);
-        }
-
-        // Camera shake
-        this.cameras.main.shake(200, 0.01);
-
-        // Texto de combo
-        const comboText = this.add.text(this.boss.x, this.boss.y - 60,
-            `-1 HP!`, {
-            fontSize: '24px',
+        const text = this.add.text(x, y, pointText, {
+            fontSize: multiplier > 1 ? '24px' : '20px',
             fontFamily: 'Arial',
-            color: '#f1c40f',
-            fontStyle: 'bold'
+            color: multiplier > 1 ? '#f1c40f' : '#2ecc71',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 2
         }).setOrigin(0.5);
 
         this.tweens.add({
-            targets: comboText,
-            y: comboText.y - 30,
+            targets: text,
+            y: y - 40,
             alpha: 0,
+            scale: multiplier > 1 ? 1.5 : 1.2,
             duration: 800,
-            onComplete: () => comboText.destroy()
+            ease: 'Power2',
+            onComplete: () => text.destroy()
         });
 
-        // Pontuacao
-        gameState.addScore(200);
-
-        // Verificar se o boss morreu
-        if (this.bossHealth <= 0) {
-            this.defeatBoss();
-        } else {
-            // Boss fica invencivel por 1 segundo
-            this.time.delayedCall(1000, () => {
-                this.bossInvincible = false;
-                if (this.boss?.clearTint) {
-                    this.boss.clearTint();
-                }
+        // Particulas
+        for (let i = 0; i < 8; i++) {
+            const particle = this.add.circle(x, y, 4, 0x2ecc71);
+            const angle = (Math.PI * 2 / 8) * i;
+            this.tweens.add({
+                targets: particle,
+                x: x + Math.cos(angle) * 40,
+                y: y + Math.sin(angle) * 40,
+                alpha: 0,
+                scale: 0,
+                duration: 400,
+                onComplete: () => particle.destroy()
             });
         }
     }
 
-    defeatBoss() {
-        this.bossDefeated = true;
+    showMotivationalMessage() {
+        const messages = [
+            'Boa Carla! 🌱',
+            'Continua assim!',
+            'O planeta agradece! 🌍',
+            'Eco-power! ♻️',
+            'Fantastico!',
+            'ISCTE mais verde!'
+        ];
 
-        // Parar timers do boss
-        this.bossAttackTimer?.destroy();
-        this.bossMoveTimer?.destroy();
+        const message = Phaser.Utils.Array.GetRandom(messages);
+        const width = this.cameras.main.width;
 
-        // Destruir projecteis
-        this.projectiles.clear(true, true);
+        const text = this.add.text(width / 2, 120, message, {
+            fontSize: '20px',
+            fontFamily: 'Arial',
+            color: '#2ecc71',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 2
+        }).setOrigin(0.5);
 
-        // Animacao de derrota
         this.tweens.add({
-            targets: this.boss,
-            y: this.boss.y + 200,
+            targets: text,
+            y: text.y - 20,
             alpha: 0,
-            angle: 180,
             duration: 1500,
             ease: 'Power2',
-            onComplete: () => {
-                this.boss?.destroy();
-            }
+            onComplete: () => text.destroy()
         });
+    }
+
+    handleBossDefeated() {
+        // Limpar projeteis e coletaveis restantes
+        this.trashProjectiles.clear(true, true);
+        this.bossCollectibles.clear(true, true);
 
         // Esconder HUD do boss
         this.tweens.add({
-            targets: [this.bossHealthBg, this.bossHealthBar, this.bossNameText],
+            targets: [this.bossHealthBg, this.bossHealthBar, this.bossNameText, this.bossHPText],
             alpha: 0,
             duration: 500
         });
 
-        // Mensagem de vitoria
-        const width = this.cameras.main.width;
-        const height = this.cameras.main.height;
-
-        const victoryText = this.add.text(width / 2, height / 2 - 30,
-            'DOUTOR PLASTICO DERROTADO!', {
-            fontSize: '28px',
-            fontFamily: 'Arial',
-            color: '#2ecc71',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
-
-        this.tweens.add({
-            targets: victoryText,
-            scale: { from: 0.5, to: 1 },
-            duration: 500,
-            ease: 'Back.easeOut'
-        });
-
-        // Bonus de pontuacao
-        gameState.addScore(1000);
-
         // Transicao para Victory apos 3 segundos
         this.time.delayedCall(3000, () => this.goToVictory());
-    }
-
-    handleProjectileHit(player, projectile) {
-        if (player.isInvincible) return;
-
-        projectile.destroy();
-        this.handlePlayerDamage();
     }
 
     handlePlayerDamage() {
@@ -442,9 +424,9 @@ export default class Level3Scene extends Phaser.Scene {
             this.handlePlayerFall();
         }
 
-        // Limpar projecteis fora da tela
-        this.projectiles.getChildren().forEach(p => {
-            if (p.x < -50 || p.x > 850 || p.y < -50 || p.y > 650) {
+        // Limpar projeteis fora do ecra
+        this.trashProjectiles.getChildren().forEach(p => {
+            if (p && p.active && (p.x < -50 || p.x > 850 || p.y > 500)) {
                 p.destroy();
             }
         });

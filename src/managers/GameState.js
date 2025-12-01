@@ -21,6 +21,8 @@ class GameState {
         this.currentLevel = 1;
         this.itemsCollected = 0;
         this.totalItems = 0;
+        this.globalItemsCollected = 0; // Total global de todos os niveis
+        this.globalTotalItems = 0;     // Total global esperado
         this.combo = 0;
         this.maxCombo = 0;
         this.lastCollectTime = 0;
@@ -103,6 +105,7 @@ class GameState {
      */
     nextLevel() {
         this.currentLevel++;
+        // Resetar contagem do nivel atual mas manter global
         this.itemsCollected = 0;
         this.totalItems = 0;
         return this.currentLevel;
@@ -113,6 +116,7 @@ class GameState {
      */
     collectItem() {
         this.itemsCollected++;
+        this.globalItemsCollected++;
     }
 
     /**
@@ -120,10 +124,18 @@ class GameState {
      */
     setTotalItems(total) {
         this.totalItems = total;
+        this.globalTotalItems += total;
     }
 
     /**
-     * Obter percentagem de itens coletados
+     * Adicionar ao total global (usado quando nivel ja definiu itens)
+     */
+    addToGlobalTotal(total) {
+        this.globalTotalItems += total;
+    }
+
+    /**
+     * Obter percentagem de itens coletados (nivel atual)
      */
     getCollectionPercentage() {
         if (this.totalItems === 0) return 0;
@@ -131,10 +143,18 @@ class GameState {
     }
 
     /**
-     * Calcular estrelas baseado em performance
+     * Obter percentagem global de itens coletados
+     */
+    getGlobalCollectionPercentage() {
+        if (this.globalTotalItems === 0) return 100; // Se nao ha itens, considera completo
+        return Math.floor((this.globalItemsCollected / this.globalTotalItems) * 100);
+    }
+
+    /**
+     * Calcular estrelas baseado em performance global
      */
     getStars() {
-        const percentage = this.getCollectionPercentage();
+        const percentage = this.getGlobalCollectionPercentage();
         if (percentage >= 90) return 3;
         if (percentage >= 50) return 2;
         return 1;
@@ -186,9 +206,9 @@ class GameState {
             score: this.score,
             highScore: this.highScore,
             stars: this.getStars(),
-            itemsCollected: this.itemsCollected,
-            totalItems: this.totalItems,
-            percentage: this.getCollectionPercentage(),
+            itemsCollected: this.globalItemsCollected,
+            totalItems: this.globalTotalItems,
+            percentage: this.getGlobalCollectionPercentage(),
             maxCombo: this.maxCombo
         };
     }
