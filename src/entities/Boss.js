@@ -222,6 +222,10 @@ export default class Boss extends Phaser.GameObjects.Container {
             align: 'center'
         }).setOrigin(0.5);
 
+        // Guardar referencia para limpeza quando boss morre
+        if (!this.activeBattlePhrases) this.activeBattlePhrases = [];
+        this.activeBattlePhrases.push({ bubble, text });
+
         // Animacao de entrada
         bubble.setScale(0);
         text.setAlpha(0);
@@ -583,6 +587,15 @@ export default class Boss extends Phaser.GameObjects.Container {
     defeat() {
         this.isDefeated = true;
 
+        // Limpar frases de batalha ativas (para nao sobrepor)
+        if (this.activeBattlePhrases) {
+            this.activeBattlePhrases.forEach(({ bubble, text }) => {
+                if (bubble?.active) bubble.destroy();
+                if (text?.active) text.destroy();
+            });
+            this.activeBattlePhrases = [];
+        }
+
         // Som de derrota do boss
         audioManager.playBossDefeat();
 
@@ -593,10 +606,10 @@ export default class Boss extends Phaser.GameObjects.Container {
         // Parar todas as tweens neste objeto
         this.scene.tweens.killTweensOf(this);
 
-        // Mensagem de derrota
+        // Mensagem de derrota (Y=100 para nao sobrepor HUD)
         const width = this.scene.cameras.main.width;
 
-        const defeatText = this.scene.add.text(width / 2, 80, 'RICARDO GOIS DERROTADO!', {
+        const defeatText = this.scene.add.text(width / 2, 100, 'RICARDO GOIS DERROTADO!', {
             fontSize: '28px',
             fontFamily: 'Arial Black',
             color: '#2ecc71',
@@ -604,8 +617,8 @@ export default class Boss extends Phaser.GameObjects.Container {
             strokeThickness: 4
         }).setOrigin(0.5);
 
-        // Frase engracada de derrota
-        const funnyDefeat = this.scene.add.text(width / 2, 115, 'Vou buscar o meu casaco...', {
+        // Frase engracada de derrota (Y=160 para maior espacamento)
+        const funnyDefeat = this.scene.add.text(width / 2, 160, 'Vou buscar o meu casaco...', {
             fontSize: '16px',
             fontFamily: 'Arial',
             color: '#e74c3c',

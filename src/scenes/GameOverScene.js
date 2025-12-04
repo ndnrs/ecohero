@@ -216,6 +216,7 @@ export default class GameOverScene extends Phaser.Scene {
             this.createButton(width / 2, 385, '🔄 Tentar Novamente', () => {
                 this.cameras.main.fadeOut(500);
                 this.cameras.main.once('camerafadeoutcomplete', () => {
+                    gameState.reset(); // Reiniciar estado do jogo
                     this.scene.start('Level1Scene');
                 });
             });
@@ -223,6 +224,7 @@ export default class GameOverScene extends Phaser.Scene {
             this.createButton(width / 2, 430, '🏠 Menu Principal', () => {
                 this.cameras.main.fadeOut(500);
                 this.cameras.main.once('camerafadeoutcomplete', () => {
+                    gameState.reset(); // Reiniciar estado do jogo
                     this.scene.start('MenuScene');
                 });
             });

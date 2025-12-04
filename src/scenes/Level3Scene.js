@@ -412,6 +412,15 @@ export default class Level3Scene extends Phaser.Scene {
             duration: 500
         });
 
+        // Esconder combo e itens do HUD (para nao sobrepor mensagem de vitoria)
+        if (this.hud?.elements) {
+            this.tweens.add({
+                targets: [this.hud.elements.comboText, this.hud.elements.itemsText],
+                alpha: 0,
+                duration: 500
+            });
+        }
+
         // Transicao para Victory apos 3 segundos
         this.time.delayedCall(3000, () => this.goToVictory());
     }

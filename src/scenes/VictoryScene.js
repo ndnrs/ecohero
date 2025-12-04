@@ -511,6 +511,7 @@ export default class VictoryScene extends Phaser.Scene {
             this.createButton(width / 2 - 90, 420, '🔄 Jogar Novamente', () => {
                 this.cameras.main.fadeOut(500);
                 this.cameras.main.once('camerafadeoutcomplete', () => {
+                    gameState.reset(); // Reiniciar estado do jogo
                     this.scene.start('Level1Scene');
                 });
             });
@@ -518,6 +519,7 @@ export default class VictoryScene extends Phaser.Scene {
             this.createButton(width / 2 + 90, 420, '🏠 Menu', () => {
                 this.cameras.main.fadeOut(500);
                 this.cameras.main.once('camerafadeoutcomplete', () => {
+                    gameState.reset(); // Reiniciar estado do jogo
                     this.scene.start('MenuScene');
                 });
             });
