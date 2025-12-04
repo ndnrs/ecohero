@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit:*)",
+      "Bash(ls -la \"C:\\Users\\ndnrs\\OneDrive - ISCTE-IUL\\Desktop\\Projetos\\ecohero\\public\\assets\\images\"\" 2>/dev/null || dir \"C:UsersndnrsOneDrive - ISCTE-IULDesktopProjetosecoheropublicassetsimages\"\")",
+      "Bash(dir \"C:\\Users\\ndnrs\\OneDrive - ISCTE-IUL\\Desktop\\Projetos\\ecohero\\public\\assets\\images\")",
+      "Bash(git add:*)",
+      "Bash(node --check:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

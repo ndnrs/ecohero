@@ -52,8 +52,16 @@ const config = {
 
     // Configuracoes de escala para responsividade
     scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH
+        mode: Phaser.Scale.ENVELOP,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        min: {
+            width: 400,
+            height: 225
+        },
+        max: {
+            width: 1600,
+            height: 900
+        }
     },
 
     // Suporte para multi-touch (importante para controlos mobile)
