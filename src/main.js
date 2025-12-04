@@ -52,9 +52,11 @@ const config = {
 
     // Configuracoes de escala para responsividade
     scale: {
-        mode: Phaser.Scale.EXPAND,
+        mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        fullscreenTarget: 'game-container'
+        width: 800,
+        height: 450,
+        parent: 'game-container'
     },
 
     // Suporte para multi-touch (importante para controlos mobile)
