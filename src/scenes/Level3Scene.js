@@ -324,19 +324,22 @@ export default class Level3Scene extends Phaser.Scene {
             }
         }
 
-        // Mensagem motivacional ocasional
-        if (Math.random() < 0.3) {
+        // Mensagem motivacional ocasional - APENAS se nao estiver a mostrar uma
+        if (!this.isShowingMotivational && Math.random() < 0.3) {
             this.showMotivationalMessage();
         }
     }
 
     showCollectEffect(x, y, points, multiplier) {
-        // Texto de pontos
+        // Texto de pontos - posicionar ABAIXO da mensagem motivacional se existir
         const pointText = multiplier > 1 ?
             `+${points} x${multiplier}!` :
             `+${points}`;
 
-        const text = this.add.text(x, y, pointText, {
+        // CORRECAO: Ajustar Y inicial se mensagem motivacional estiver ativa
+        const startY = this.isShowingMotivational ? Math.max(y, 160) : y;
+
+        const text = this.add.text(x, startY, pointText, {
             fontSize: multiplier > 1 ? '24px' : '20px',
             fontFamily: 'Arial',
             color: multiplier > 1 ? '#f1c40f' : '#2ecc71',
@@ -347,7 +350,7 @@ export default class Level3Scene extends Phaser.Scene {
 
         this.tweens.add({
             targets: text,
-            y: y - 40,
+            y: startY - 40,
             alpha: 0,
             scale: multiplier > 1 ? 1.5 : 1.2,
             duration: 800,
@@ -540,9 +543,6 @@ export default class Level3Scene extends Phaser.Scene {
         if (this.transitioning) return;
         this.transitioning = true;
 
-        // Parar todos os timers e tweens pendentes
-        this.time.removeAllEvents();
-
         // Parar comportamento do boss se ainda existir
         if (this.boss) {
             this.boss.isDefeated = true;
@@ -550,16 +550,18 @@ export default class Level3Scene extends Phaser.Scene {
             if (this.boss.moveTimer) this.boss.moveTimer.destroy();
         }
 
-        this.cameras.main.fadeOut(1000);
-        this.cameras.main.once('camerafadeoutcomplete', () => {
-            this.scene.start('VictoryScene');
-        });
-
-        // Fallback de seguranca - se fadeOut nao completar em 1.5s, forcar transicao
-        this.time.delayedCall(1500, () => {
-            if (this.scene.isActive()) {
+        // Criar fallback PRIMEIRO
+        const fallbackTimer = this.time.delayedCall(2000, () => {
+            if (this.scene && this.scene.isActive()) {
                 this.scene.start('VictoryScene');
             }
+        });
+
+        this.cameras.main.fadeOut(1000);
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+            // Cancelar fallback se fadeOut completou
+            if (fallbackTimer) fallbackTimer.destroy();
+            this.scene.start('VictoryScene');
         });
     }
 }

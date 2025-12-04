@@ -71,12 +71,17 @@ export default class Boss extends Phaser.GameObjects.Container {
             photo.setScale(scale);
 
             // Criar mascara retangular para cortar o excesso
-            const maskGraphics = this.scene.make.graphics();
-            maskGraphics.fillStyle(0xffffff);
-            maskGraphics.fillRect(-30, -55, 60, 60); // Centrado em (0, -25)
-            photo.setMask(maskGraphics.createGeometryMask());
+            // CORRECAO: Usar sprite temporario para bitmap mask (funciona com Containers)
+            const maskShape = this.scene.make.graphics();
+            maskShape.fillStyle(0xffffff);
+            maskShape.fillRect(-30, -30, 60, 60); // Relativo ao centro (0, 0)
+            maskShape.setPosition(0, -25); // Posicionar no mesmo local da foto
+            const mask = maskShape.createGeometryMask();
+            photo.setMask(mask);
 
             this.add(photo);
+            this.add(maskShape); // Adicionar ao container para que se mova junto
+            maskShape.setVisible(false); // Esconder a geometria da mascara
             this.photoSprite = photo;
         } else {
             // Fallback: inicial R
