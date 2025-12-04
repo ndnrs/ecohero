@@ -60,7 +60,15 @@ const config = {
         height: 450,
         parent: 'game-container',
         fullscreenTarget: 'game-container',
-        expandParent: false
+        expandParent: true,
+        min: {
+            width: 320,
+            height: 180
+        },
+        max: {
+            width: 1600,
+            height: 900
+        }
     },
 
     // Suporte para multi-touch (importante para controlos mobile)

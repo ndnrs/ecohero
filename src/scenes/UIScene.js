@@ -9,6 +9,7 @@ import Phaser from 'phaser';
 export default class UIScene extends Phaser.Scene {
     constructor() {
         super({ key: 'UIScene' });
+        this.resizeTimeout = null;
     }
 
     create() {
@@ -20,6 +21,11 @@ export default class UIScene extends Phaser.Scene {
 
         // Handler para resize
         this.scale.on('resize', this.handleResize, this);
+
+        // Refresh inicial para garantir dimensoes correctas no mobile
+        this.time.delayedCall(100, () => {
+            this.scale.refresh();
+        });
     }
 
     createFullscreenButton() {
@@ -68,9 +74,20 @@ export default class UIScene extends Phaser.Scene {
             this.toggleFullscreen();
         });
 
-        // Listener para mudanca de fullscreen
+        // Listener para mudanca de fullscreen com refresh forcado
         this.scale.on('fullscreenchange', () => {
             this.updateFullscreenIcon();
+
+            // Forcar refresh apos mudanca de fullscreen
+            // Delays necessarios porque o browser precisa de tempo para actualizar o DOM
+            this.time.delayedCall(100, () => {
+                this.scale.refresh();
+            });
+
+            // Segundo refresh para garantir (alguns browsers sao lentos)
+            this.time.delayedCall(300, () => {
+                this.scale.refresh();
+            });
         });
     }
 
