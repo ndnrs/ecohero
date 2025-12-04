@@ -226,7 +226,7 @@ export default class VictoryScene extends Phaser.Scene {
     }
 
     createSubtitle(width) {
-        const subtitle = this.add.text(width / 2, 120, 'Salvaste o campus do ISCTE!', {
+        const subtitle = this.add.text(width / 2, 115, 'Salvaste o campus do ISCTE!', {
             fontSize: '22px',
             fontFamily: 'Arial',
             color: '#2ecc71',
@@ -244,7 +244,7 @@ export default class VictoryScene extends Phaser.Scene {
     }
 
     createBossMessage(width) {
-        const bossMessage = this.add.text(width / 2, 150, 'O Monstro dos AC\'s foi derrotado! Os ACs estao todos salvos! ❄️', {
+        const bossMessage = this.add.text(width / 2, 142, 'O Monstro dos AC\'s foi derrotado! Os ACs estao todos salvos! ❄️', {
             fontSize: '16px',
             fontFamily: 'Arial',
             color: '#e74c3c',
@@ -261,10 +261,10 @@ export default class VictoryScene extends Phaser.Scene {
         });
 
         // Mensagem extra engracada
-        const funnyMsg = this.add.text(width / 2, 168, 'Agora ele pode vestir as suas 6 camadas de roupa em paz!', {
+        const funnyMsg = this.add.text(width / 2, 162, 'Agora ele pode vestir as suas 6 camadas de roupa em paz!', {
             fontSize: '12px',
             fontFamily: 'Arial',
-            color: '#9b59b6',
+            color: '#ffffff',
             fontStyle: 'italic'
         });
         funnyMsg.setOrigin(0.5);
@@ -280,7 +280,7 @@ export default class VictoryScene extends Phaser.Scene {
 
     createScoreSection(width, data) {
         // Caixa de pontuacao
-        const scoreBox = this.add.rectangle(width / 2, 200, 280, 70, 0x27ae60, 0.3);
+        const scoreBox = this.add.rectangle(width / 2, 210, 280, 70, 0x27ae60, 0.3);
         scoreBox.setStrokeStyle(2, 0xf1c40f);
         scoreBox.setAlpha(0);
 
@@ -292,7 +292,7 @@ export default class VictoryScene extends Phaser.Scene {
         });
 
         // Label
-        const scoreLabel = this.add.text(width / 2, 180, 'Pontuacao Final', {
+        const scoreLabel = this.add.text(width / 2, 185, 'Pontuacao Final', {
             fontSize: '14px',
             fontFamily: 'Arial',
             color: '#bdc3c7'
@@ -301,7 +301,7 @@ export default class VictoryScene extends Phaser.Scene {
         scoreLabel.setAlpha(0);
 
         // Pontuacao
-        const scoreText = this.add.text(width / 2, 205, '0', {
+        const scoreText = this.add.text(width / 2, 215, '0', {
             fontSize: '36px',
             fontFamily: 'Arial Black',
             color: '#f1c40f'
@@ -343,7 +343,7 @@ export default class VictoryScene extends Phaser.Scene {
     }
 
     createStars(width, data) {
-        const starsY = 255;
+        const starsY = 260;
         const starSpacing = 45;
         const startX = width / 2 - starSpacing;
         const numStars = data.stars;
@@ -383,39 +383,16 @@ export default class VictoryScene extends Phaser.Scene {
                 }
             });
         }
-
-        // Texto de rating
-        const ratingMessages = {
-            1: 'Bom trabalho!',
-            2: 'Muito bem!',
-            3: 'PERFEITO!'
-        };
-
-        const ratingText = this.add.text(width / 2, 295, ratingMessages[numStars] || 'Completo!', {
-            fontSize: '18px',
-            fontFamily: 'Arial',
-            color: numStars === 3 ? '#f1c40f' : '#2ecc71',
-            fontStyle: 'bold'
-        });
-        ratingText.setOrigin(0.5);
-        ratingText.setAlpha(0);
-
-        this.tweens.add({
-            targets: ratingText,
-            alpha: 1,
-            duration: 500,
-            delay: 2700
-        });
     }
 
     createSpecialMessages(width, data) {
         // Easter egg: pontuacao alta
         if (data.score > 1000) {
-            const easterEgg = this.add.text(width / 2, 325,
+            const easterEgg = this.add.text(width / 2, 330,
                 'Carla, es uma verdadeira EcoHero! 🦸‍♀️', {
                 fontSize: '18px',
                 fontFamily: 'Arial',
-                color: '#9b59b6',
+                color: '#ffffff',
                 fontStyle: 'bold'
             });
             easterEgg.setOrigin(0.5);
@@ -443,7 +420,7 @@ export default class VictoryScene extends Phaser.Scene {
 
         // Easter egg: 3 estrelas
         if (data.stars === 3) {
-            const perfectText = this.add.text(width / 2, 325,
+            const perfectText = this.add.text(width / 2, 350,
                 '🏆 MESTRE DA RECICLAGEM 🏆', {
                 fontSize: '16px',
                 fontFamily: 'Arial',
@@ -464,11 +441,11 @@ export default class VictoryScene extends Phaser.Scene {
 
     createChristmasMessage(width) {
         // Mensagem de Natal da equipa
-        const christmasBox = this.add.rectangle(width / 2, 365, 320, 50, 0x145214, 0.8);
+        const christmasBox = this.add.rectangle(width / 2, 375, 320, 50, 0x145214, 0.8);
         christmasBox.setStrokeStyle(2, 0xe74c3c);
         christmasBox.setAlpha(0);
 
-        const christmasMsg = this.add.text(width / 2, 358,
+        const christmasMsg = this.add.text(width / 2, 375,
             'Feliz Natal da equipa GEQS! 🎄', {
             fontSize: '20px',
             fontFamily: 'Arial',
@@ -478,17 +455,8 @@ export default class VictoryScene extends Phaser.Scene {
         christmasMsg.setOrigin(0.5);
         christmasMsg.setAlpha(0);
 
-        const subMsg = this.add.text(width / 2, 378,
-            'O planeta agradece! 🌍💚', {
-            fontSize: '14px',
-            fontFamily: 'Arial',
-            color: '#ecf0f1'
-        });
-        subMsg.setOrigin(0.5);
-        subMsg.setAlpha(0);
-
         this.tweens.add({
-            targets: [christmasBox, christmasMsg, subMsg],
+            targets: [christmasBox, christmasMsg],
             alpha: 1,
             duration: 500,
             delay: 3400
