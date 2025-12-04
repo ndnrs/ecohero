@@ -35,6 +35,11 @@ export default class Level3Scene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
 
+        // CORRECAO: Limpar estado da camera e remover listeners antigos
+        // Isto previne bugs quando a cena e reiniciada apos game over
+        this.cameras.main.off('camerafadeoutcomplete');
+        this.cameras.main.resetFX();
+
         this.cameras.main.fadeIn(500);
 
         this.createBackground(width, height);
@@ -285,6 +290,7 @@ export default class Level3Scene extends Phaser.Scene {
     }
 
     handleTrashHit(player, trash) {
+        if (this.bossDefeated) return;
         if (player.isInvincible) return;
 
         trash.destroy();
@@ -468,6 +474,7 @@ export default class Level3Scene extends Phaser.Scene {
 
     handlePlayerDamage() {
         if (this.player.isInvincible) return;
+        if (this.bossDefeated) return;
 
         this.player.isInvincible = true;
         this.player.hit();
@@ -501,7 +508,7 @@ export default class Level3Scene extends Phaser.Scene {
         this.hud?.update();
 
         // Verificar queda
-        if (this.player.y > this.cameras.main.height + 50) {
+        if (!this.bossDefeated && this.player.y > this.cameras.main.height + 50) {
             this.handlePlayerFall();
         }
 
@@ -526,6 +533,7 @@ export default class Level3Scene extends Phaser.Scene {
     }
 
     handlePlayerFall() {
+        if (this.bossDefeated) return;
         const lives = gameState.loseLife();
         if (gameState.isGameOver()) {
             this.cameras.main.fadeOut(500);
@@ -550,17 +558,11 @@ export default class Level3Scene extends Phaser.Scene {
             if (this.boss.moveTimer) this.boss.moveTimer.destroy();
         }
 
-        // Criar fallback PRIMEIRO
-        const fallbackTimer = this.time.delayedCall(2000, () => {
-            if (this.scene && this.scene.isActive()) {
-                this.scene.start('VictoryScene');
-            }
-        });
-
+        // Fazer fadeOut (visual apenas)
         this.cameras.main.fadeOut(1000);
-        this.cameras.main.once('camerafadeoutcomplete', () => {
-            // Cancelar fallback se fadeOut completou
-            if (fallbackTimer) fallbackTimer.destroy();
+
+        // Transicao garantida apos 1.5s (tempo do fadeOut + margem de seguranca)
+        this.time.delayedCall(1500, () => {
             this.scene.start('VictoryScene');
         });
     }

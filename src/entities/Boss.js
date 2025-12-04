@@ -718,6 +718,10 @@ export default class Boss extends Phaser.GameObjects.Container {
     destroy() {
         if (this.attackTimer) this.attackTimer.destroy();
         if (this.moveTimer) this.moveTimer.destroy();
+        // Limpar referencia na cena para evitar acesso a objeto destruido
+        if (this.scene && this.scene.boss === this) {
+            this.scene.boss = null;
+        }
         super.destroy();
     }
 }
