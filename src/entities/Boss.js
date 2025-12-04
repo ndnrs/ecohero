@@ -65,23 +65,11 @@ export default class Boss extends Phaser.GameObjects.Container {
         if (this.scene.textures.exists('ricardo-photo-2')) {
             const photo = this.scene.add.image(0, -25, 'ricardo-photo-2');
             photo.setOrigin(0.5); // Centrar na moldura
-            // Ajustar escala para PREENCHER a moldura (cover, nao contain)
+            // Ajustar escala para caber na moldura
             const maxSize = 60;
-            const scale = Math.max(maxSize / photo.width, maxSize / photo.height);
+            const scale = Math.min(maxSize / photo.width, maxSize / photo.height);
             photo.setScale(scale);
-
-            // Criar mascara retangular para cortar o excesso
-            // CORRECAO: Usar sprite temporario para bitmap mask (funciona com Containers)
-            const maskShape = this.scene.make.graphics();
-            maskShape.fillStyle(0xffffff);
-            maskShape.fillRect(-30, -30, 60, 60); // Relativo ao centro (0, 0)
-            maskShape.setPosition(0, -25); // Posicionar no mesmo local da foto
-            const mask = maskShape.createGeometryMask();
-            photo.setMask(mask);
-
             this.add(photo);
-            this.add(maskShape); // Adicionar ao container para que se mova junto
-            maskShape.setVisible(false); // Esconder a geometria da mascara
             this.photoSprite = photo;
         } else {
             // Fallback: inicial R
