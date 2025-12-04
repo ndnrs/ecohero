@@ -14,6 +14,7 @@ import Level3Scene from './scenes/Level3Scene.js';
 import GameOverScene from './scenes/GameOverScene.js';
 import VictoryScene from './scenes/VictoryScene.js';
 import PauseScene from './scenes/PauseScene.js';
+import UIScene from './scenes/UIScene.js';
 
 // Configuracao do jogo Phaser
 const config = {
@@ -47,7 +48,8 @@ const config = {
         Level3Scene,
         GameOverScene,
         VictoryScene,
-        PauseScene
+        PauseScene,
+        UIScene
     ],
 
     // Configuracoes de escala para responsividade
@@ -56,7 +58,9 @@ const config = {
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 800,
         height: 450,
-        parent: 'game-container'
+        parent: 'game-container',
+        fullscreenTarget: 'game-container',
+        expandParent: false
     },
 
     // Suporte para multi-touch (importante para controlos mobile)

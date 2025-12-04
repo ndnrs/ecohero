@@ -79,9 +79,6 @@ export default class MenuScene extends Phaser.Scene {
         });
         credits.setOrigin(0.5);
 
-        // Botao de fullscreen (importante para mobile)
-        this.createFullscreenButton(width, height);
-
         // Adicionar particulas decorativas (folhas ou estrelas)
         this.createDecorativeParticles(width, height);
     }
@@ -168,70 +165,6 @@ export default class MenuScene extends Phaser.Scene {
             ease: 'Sine.easeInOut',
             yoyo: true,
             repeat: -1
-        });
-    }
-
-    createFullscreenButton(width, height) {
-        // Botao no canto superior direito
-        const btnSize = 40;
-        const btnX = width - 30;
-        const btnY = 30;
-
-        // Fundo do botao
-        const btnBg = this.add.circle(btnX, btnY, btnSize / 2, 0x333333, 0.8);
-        btnBg.setStrokeStyle(2, 0x2ecc71);
-        btnBg.setInteractive({ useHandCursor: true });
-        btnBg.setScrollFactor(0);
-        btnBg.setDepth(1000);
-
-        // Icone fullscreen
-        const btnIcon = this.add.text(btnX, btnY, '⛶', {
-            fontSize: '20px',
-            color: '#ffffff'
-        });
-        btnIcon.setOrigin(0.5);
-        btnIcon.setScrollFactor(0);
-        btnIcon.setDepth(1001);
-
-        // Texto de ajuda
-        const helpText = this.add.text(btnX - 60, btnY, 'Ecra cheio', {
-            fontSize: '12px',
-            color: '#95a5a6'
-        });
-        helpText.setOrigin(1, 0.5);
-        helpText.setAlpha(0);
-        helpText.setScrollFactor(0);
-        helpText.setDepth(1001);
-
-        // Hover effect
-        btnBg.on('pointerover', () => {
-            btnBg.setFillStyle(0x2ecc71, 0.9);
-            helpText.setAlpha(1);
-        });
-
-        btnBg.on('pointerout', () => {
-            btnBg.setFillStyle(0x333333, 0.8);
-            helpText.setAlpha(0);
-        });
-
-        // Click - toggle fullscreen
-        btnBg.on('pointerup', () => {
-            if (this.scale.isFullscreen) {
-                this.scale.stopFullscreen();
-                btnIcon.setText('⛶');
-            } else {
-                this.scale.startFullscreen();
-                btnIcon.setText('✕');
-            }
-        });
-
-        // Listener para mudanca de fullscreen
-        this.scale.on('fullscreenchange', () => {
-            if (this.scale.isFullscreen) {
-                btnIcon.setText('✕');
-            } else {
-                btnIcon.setText('⛶');
-            }
         });
     }
 

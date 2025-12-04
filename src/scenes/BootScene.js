@@ -120,6 +120,9 @@ export default class BootScene extends Phaser.Scene {
         this.progressBar.width = 390;
         this.percentText.setText('100%');
 
+        // Lancar UIScene em paralelo (botao fullscreen global)
+        this.scene.launch('UIScene');
+
         // Transicao para a intro (historia)
         this.time.delayedCall(800, () => {
             this.cameras.main.fadeOut(500, 0, 0, 0);
