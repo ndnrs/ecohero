@@ -259,13 +259,16 @@ export default class HUD {
         msgText.setScrollFactor(0);
         msgText.setDepth(200);
 
-        this.scene.tweens.add({
-            targets: msgText,
-            y: 100,
-            alpha: 0,
-            duration: 1500,
-            ease: 'Power2',
-            onComplete: () => msgText.destroy()
+        // Ficar visivel por 2 segundos antes de comecar a desaparecer
+        this.scene.time.delayedCall(2000, () => {
+            this.scene.tweens.add({
+                targets: msgText,
+                y: 100,
+                alpha: 0,
+                duration: 800,
+                ease: 'Power2',
+                onComplete: () => msgText.destroy()
+            });
         });
     }
 

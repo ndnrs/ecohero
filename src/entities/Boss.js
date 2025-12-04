@@ -51,28 +51,71 @@ export default class Boss extends Phaser.GameObjects.Container {
     }
 
     createSprite() {
-        // Sprite principal do boss
-        if (this.scene.textures.exists('boss-idle')) {
-            this.sprite = this.scene.add.sprite(0, 0, 'boss-idle');
+        // Sprite principal do boss - corpo
+        this.sprite = this.scene.add.rectangle(0, 20, 80, 80, 0x8e44ad);
+        this.sprite.setStrokeStyle(3, 0x6c3483);
+        this.add(this.sprite);
+
+        // Moldura para a foto do Ricardo
+        const photoFrame = this.scene.add.rectangle(0, -25, 70, 70, 0x4a0000);
+        photoFrame.setStrokeStyle(4, 0xe74c3c);
+        this.add(photoFrame);
+
+        // Tentar usar foto real do Ricardo
+        if (this.scene.textures.exists('ricardo-photo')) {
+            const photo = this.scene.add.image(0, -25, 'ricardo-photo');
+            // Ajustar escala para caber na moldura
+            const maxSize = 60;
+            const scale = Math.min(maxSize / photo.width, maxSize / photo.height);
+            photo.setScale(scale);
+            this.add(photo);
+            this.photoSprite = photo;
         } else {
-            // Fallback: criar boss como graphics
-            this.sprite = this.scene.add.rectangle(0, 0, 80, 100, 0x8e44ad);
-            this.sprite.setStrokeStyle(3, 0x6c3483);
-
-            // Olhos malvados
-            const leftEye = this.scene.add.circle(-15, -15, 10, 0xff0000);
-            const rightEye = this.scene.add.circle(15, -15, 10, 0xff0000);
-            const leftPupil = this.scene.add.circle(-15, -15, 5, 0x000000);
-            const rightPupil = this.scene.add.circle(15, -15, 5, 0x000000);
-
-            // Boca zangada
-            const mouth = this.scene.add.rectangle(0, 20, 40, 8, 0x000000);
-
-            this.add([this.sprite, leftEye, rightEye, leftPupil, rightPupil, mouth]);
-            return;
+            // Fallback: inicial R
+            const placeholder = this.scene.add.text(0, -25, 'R', {
+                fontSize: '40px',
+                fontFamily: 'Arial Black',
+                color: '#ffffff'
+            }).setOrigin(0.5);
+            this.add(placeholder);
         }
 
-        this.add(this.sprite);
+        // Simbolo de vilao
+        const villainSymbol = this.scene.add.text(0, 55, '🦹', {
+            fontSize: '20px'
+        }).setOrigin(0.5);
+        this.add(villainSymbol);
+
+        // Efeito de "aura maligna"
+        this.createEvilAura();
+    }
+
+    createEvilAura() {
+        // Particulas roxas a volta do boss
+        this.auraParticles = [];
+        for (let i = 0; i < 6; i++) {
+            const angle = (i / 6) * Math.PI * 2;
+            const particle = this.scene.add.circle(
+                Math.cos(angle) * 50,
+                Math.sin(angle) * 50 - 10,
+                4,
+                0x9b59b6,
+                0.5
+            );
+            this.add(particle);
+            this.auraParticles.push(particle);
+
+            // Rotacao continua
+            this.scene.tweens.add({
+                targets: particle,
+                x: Math.cos(angle + Math.PI) * 50,
+                y: Math.sin(angle + Math.PI) * 50 - 10,
+                duration: 3000,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
+        }
     }
 
     createFloatAnimation() {
@@ -128,12 +171,88 @@ export default class Boss extends Phaser.GameObjects.Container {
         // Animacao de ataque
         this.playAttackAnimation();
 
+        // Mostrar frase engracada ocasionalmente
+        if (Math.random() < 0.4) {
+            this.showBattlePhrase();
+        }
+
         // Lancar lixo
         for (let i = 0; i < numProjectiles; i++) {
             this.scene.time.delayedCall(i * 200, () => {
                 this.spawnTrash();
             });
         }
+    }
+
+    showBattlePhrase() {
+        // Frases engracadas do Ricardo durante a luta
+        const phrases = [
+            'Desliga o AC!',
+            'Ja estou com farfalheira!',
+            'Preciso das papas de linhaca!',
+            'Odeio correntes de ar!',
+            'Esta demasiado frio aqui!',
+            'Quero o meu desumidificador!',
+            'Vou vestir mais uma camada!'
+        ];
+
+        // Frase especial na fase 3
+        if (this.phase === 3 && Math.random() < 0.5) {
+            phrases.push('Pelo poder das 6 camadas de roupa vou-te destruir!');
+        }
+
+        const phrase = Phaser.Utils.Array.GetRandom(phrases);
+        const width = this.scene.cameras.main.width;
+
+        // Balao de fala
+        const bubbleX = this.x + (this.x < width / 2 ? 100 : -100);
+        const bubbleY = this.y + 30;
+
+        // Fundo do balao
+        const bubble = this.scene.add.rectangle(bubbleX, bubbleY, 180, 40, 0x2c2c2c, 0.9);
+        bubble.setStrokeStyle(2, 0xe74c3c);
+
+        // Texto da frase
+        const text = this.scene.add.text(bubbleX, bubbleY, phrase, {
+            fontSize: '11px',
+            fontFamily: 'Arial',
+            color: '#ffffff',
+            fontStyle: 'bold',
+            wordWrap: { width: 160 },
+            align: 'center'
+        }).setOrigin(0.5);
+
+        // Animacao de entrada
+        bubble.setScale(0);
+        text.setAlpha(0);
+
+        this.scene.tweens.add({
+            targets: bubble,
+            scale: 1,
+            duration: 200,
+            ease: 'Back.easeOut'
+        });
+
+        this.scene.tweens.add({
+            targets: text,
+            alpha: 1,
+            duration: 150,
+            delay: 100
+        });
+
+        // Remover apos 3 segundos (mais tempo para ler)
+        this.scene.time.delayedCall(3000, () => {
+            this.scene.tweens.add({
+                targets: [bubble, text],
+                alpha: 0,
+                scale: 0.5,
+                duration: 300,
+                onComplete: () => {
+                    bubble.destroy();
+                    text.destroy();
+                }
+            });
+        });
     }
 
     playAttackAnimation() {
@@ -176,10 +295,10 @@ export default class Boss extends Phaser.GameObjects.Container {
         const trash = this.scene.add.circle(x, this.y + 60, 18, 0x9b59b6);
         trash.setStrokeStyle(2, 0x8e44ad);
 
-        // Adicionar fisica
+        // Adicionar fisica - gravidade ativada para cair naturalmente
         this.scene.physics.add.existing(trash);
-        trash.body.setVelocityY(180 + (this.phase * 30)); // Mais rapido em fases avancadas
-        trash.body.setAllowGravity(false);
+        trash.body.setVelocityY(100 + (this.phase * 20)); // Velocidade inicial
+        trash.body.setAllowGravity(true); // Gravidade ativa para queda natural
 
         // Rotacao
         this.scene.tweens.add({
@@ -190,15 +309,9 @@ export default class Boss extends Phaser.GameObjects.Container {
         });
 
         // Adicionar ao grupo de projeteis
+        // O collider global em Level3Scene trata a colisao com plataformas
         if (this.scene.trashProjectiles) {
             this.scene.trashProjectiles.add(trash);
-        }
-
-        // Colisao com plataformas - transforma em coletavel
-        if (this.scene.platforms) {
-            this.scene.physics.add.collider(trash, this.scene.platforms, () => {
-                this.transformToCollectible(trash);
-            });
         }
 
         // Destruir se sair do ecra
@@ -218,26 +331,40 @@ export default class Boss extends Phaser.GameObjects.Container {
         // Destruir lixo
         trash.destroy();
 
-        // Criar coletavel
+        // Criar coletavel - NAO usar grupo, criar manualmente para controlar a fisica
         const types = ['item-bottle', 'item-can', 'item-paper'];
         const type = Phaser.Utils.Array.GetRandom(types);
 
         let collectible;
+
+        // Cores fallback por tipo
+        const colors = {
+            'item-bottle': 0x3498db,
+            'item-can': 0x95a5a6,
+            'item-paper': 0xecf0f1
+        };
+
+        // Usar sprite se textura existir, senao usar rectangle
         if (this.scene.textures.exists(type)) {
-            collectible = this.scene.physics.add.sprite(x, y, type);
+            collectible = this.scene.add.sprite(x, y, type);
         } else {
-            // Fallback com cores diferentes por tipo
-            const colors = {
-                'item-bottle': 0x3498db,
-                'item-can': 0x95a5a6,
-                'item-paper': 0xecf0f1
-            };
-            collectible = this.scene.add.rectangle(x, y, 24, 24, colors[type] || 0x2ecc71);
-            this.scene.physics.add.existing(collectible);
+            collectible = this.scene.add.rectangle(x, y, 28, 28, colors[type] || 0x2ecc71);
+            collectible.setStrokeStyle(2, 0x27ae60);
         }
 
-        collectible.body.setAllowGravity(false);
-        collectible.body.setImmovable(true);
+        // Adicionar fisica - simples, sem gravidade
+        this.scene.physics.add.existing(collectible);
+        if (collectible.body) {
+            collectible.body.setAllowGravity(false);
+            collectible.body.setImmovable(true);
+            collectible.body.setVelocity(0, 0);
+            collectible.body.setSize(32, 32);
+        }
+
+        // Adicionar ao grupo para colisao
+        if (this.scene.bossCollectibles) {
+            this.scene.bossCollectibles.add(collectible);
+        }
 
         // Guardar tipo e pontos
         collectible.itemType = type;
@@ -252,29 +379,16 @@ export default class Boss extends Phaser.GameObjects.Container {
             ease: 'Back.easeOut'
         });
 
-        // Flutuacao suave
+        // Apenas pulsacao de escala - SEM movimento para nao tremer
         this.scene.tweens.add({
             targets: collectible,
-            y: y - 5,
-            duration: 800,
+            scale: { from: 1.0, to: 1.1 },
+            duration: 1000,
             ease: 'Sine.easeInOut',
             yoyo: true,
-            repeat: -1
+            repeat: -1,
+            delay: 200 // Esperar animacao de aparecimento
         });
-
-        // Brilho
-        this.scene.tweens.add({
-            targets: collectible,
-            alpha: 0.7,
-            duration: 500,
-            yoyo: true,
-            repeat: -1
-        });
-
-        // Adicionar ao grupo de coletaveis
-        if (this.scene.bossCollectibles) {
-            this.scene.bossCollectibles.add(collectible);
-        }
 
         // Auto-destruir apos 8 segundos se nao apanhado
         this.scene.time.delayedCall(8000, () => {
@@ -482,13 +596,29 @@ export default class Boss extends Phaser.GameObjects.Container {
         // Mensagem de derrota
         const width = this.scene.cameras.main.width;
 
-        const defeatText = this.scene.add.text(width / 2, 80, 'DOUTOR PLASTICO DERROTADO!', {
+        const defeatText = this.scene.add.text(width / 2, 80, 'RICARDO GOIS DERROTADO!', {
             fontSize: '28px',
             fontFamily: 'Arial Black',
             color: '#2ecc71',
             stroke: '#000000',
             strokeThickness: 4
         }).setOrigin(0.5);
+
+        // Frase engracada de derrota
+        const funnyDefeat = this.scene.add.text(width / 2, 115, 'Vou buscar o meu casaco...', {
+            fontSize: '16px',
+            fontFamily: 'Arial',
+            color: '#e74c3c',
+            fontStyle: 'italic'
+        }).setOrigin(0.5);
+
+        funnyDefeat.setAlpha(0);
+        this.scene.tweens.add({
+            targets: funnyDefeat,
+            alpha: 1,
+            duration: 500,
+            delay: 800
+        });
 
         this.scene.tweens.add({
             targets: defeatText,

@@ -15,6 +15,16 @@ export default class BootScene extends Phaser.Scene {
         // Criar elementos visuais da barra de progresso
         this.createProgressBar();
 
+        // Carregar fotos reais para a intro e boss
+        // IMPORTANTE: Coloca as fotos em public/assets/images/
+        this.load.image('carla-photo', '/assets/images/carla.jpg');
+        this.load.image('ricardo-photo', '/assets/images/ricardo.jpeg');
+
+        // Handler para erros de carregamento (fotos opcionais)
+        this.load.on('loaderror', (file) => {
+            console.warn('Foto nao encontrada:', file.key, '- usando placeholder');
+        });
+
         // Simular carregamento para a barra de progresso
         // (os assets sao gerados no create, mas mostramos progresso aqui)
         for (let i = 0; i < 100; i++) {
@@ -107,11 +117,11 @@ export default class BootScene extends Phaser.Scene {
         this.progressBar.width = 390;
         this.percentText.setText('100%');
 
-        // Transicao para o menu
+        // Transicao para a intro (historia)
         this.time.delayedCall(800, () => {
             this.cameras.main.fadeOut(500, 0, 0, 0);
             this.cameras.main.once('camerafadeoutcomplete', () => {
-                this.scene.start('MenuScene');
+                this.scene.start('IntroScene');
             });
         });
     }

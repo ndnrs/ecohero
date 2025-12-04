@@ -10,8 +10,11 @@ export default class CollectibleManager {
     constructor(scene) {
         this.scene = scene;
 
-        // Grupo de fisica para coletaveis
-        this.collectibles = scene.physics.add.group();
+        // Grupo de fisica para coletaveis - SEM gravidade para flutuar
+        this.collectibles = scene.physics.add.group({
+            allowGravity: false,
+            immovable: true
+        });
 
         // Contadores
         this.totalItems = 0;

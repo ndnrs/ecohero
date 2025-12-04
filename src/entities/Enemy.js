@@ -87,18 +87,18 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     startFloatPattern() {
-        // Movimento sinusoidal
+        // Movimento horizontal lento apenas - SEM subir/descer para nao tremer
+        this.setVelocityX(-this.speed);
+
+        // Leve rotacao para indicar que é um inimigo flutuante
         this.scene.tweens.add({
             targets: this,
-            y: this.startY - 30,
+            angle: { from: -5, to: 5 },
             duration: 2000,
             ease: 'Sine.easeInOut',
             yoyo: true,
             repeat: -1
         });
-
-        // Movimento horizontal lento
-        this.setVelocityX(-this.speed);
     }
 
     startJumpPattern() {

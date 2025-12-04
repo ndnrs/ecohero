@@ -32,15 +32,12 @@ export default class Collectible extends Phaser.Physics.Arcade.Sprite {
         this.body.setAllowGravity(false);
         this.body.setImmovable(true);
 
-        // Hitbox
-        this.body.setSize(24, 24);
-        this.body.setOffset(4, 4);
+        // Hitbox MAIOR para facilitar coleta
+        this.body.setSize(32, 32);
+        this.body.setOffset(0, 0);
 
-        // Animacao de flutuacao
-        this.startFloatAnimation();
-
-        // Brilho/piscar
-        this.startGlowAnimation();
+        // Indicador visual estatico (sem tremor)
+        this.startGlowEffect();
     }
 
     getPointsForType(type) {
@@ -54,37 +51,25 @@ export default class Collectible extends Phaser.Physics.Arcade.Sprite {
         return pointsMap[type] || 10;
     }
 
-    startFloatAnimation() {
-        // Movimento sinusoidal suave
+    startGlowEffect() {
+        // Efeito de brilho estatico - SEM movimento para nao tremer
+        // Apenas uma leve pulsacao de escala para indicar que é coletavel
         this.scene.tweens.add({
             targets: this,
-            y: this.y - 8,
-            duration: 1000,
-            ease: 'Sine.easeInOut',
-            yoyo: true,
-            repeat: -1
-        });
-    }
-
-    startGlowAnimation() {
-        // Piscar suave para chamar atencao
-        this.scene.tweens.add({
-            targets: this,
-            alpha: 0.7,
-            duration: 500,
+            scale: { from: 1.0, to: 1.08 },
+            duration: 1200,
             ease: 'Sine.easeInOut',
             yoyo: true,
             repeat: -1
         });
 
-        // Rotacao leve para estrelas
+        // Estrelas rodam lentamente (unica excecao)
         if (this.type === 'star') {
             this.scene.tweens.add({
                 targets: this,
-                angle: 15,
-                duration: 800,
-                ease: 'Sine.easeInOut',
-                yoyo: true,
+                angle: 360,
+                duration: 8000,
+                ease: 'Linear',
                 repeat: -1
             });
         }

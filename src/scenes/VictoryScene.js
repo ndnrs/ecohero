@@ -33,6 +33,7 @@ export default class VictoryScene extends Phaser.Scene {
         this.createConfetti(width, height);
 
         // Elementos da UI (aparecem sequencialmente)
+        this.createHeroPhoto(width);
         this.createTitle(width, data);
         this.createSubtitle(width);
         this.createBossMessage(width);
@@ -45,6 +46,78 @@ export default class VictoryScene extends Phaser.Scene {
         // Efeitos especiais
         this.time.delayedCall(500, () => {
             this.cameras.main.flash(300, 46, 204, 113, true);
+        });
+    }
+
+    createHeroPhoto(width) {
+        // Foto da Carla como heroina vitoriosa
+        const photoY = 225;
+
+        // Moldura dourada
+        const frame = this.add.rectangle(width - 100, photoY, 90, 90, 0xf1c40f);
+        frame.setStrokeStyle(4, 0x27ae60);
+        frame.setAlpha(0);
+
+        // Tentar usar foto real da Carla
+        let photoElement;
+        if (this.textures.exists('carla-photo')) {
+            photoElement = this.add.image(width - 100, photoY, 'carla-photo');
+            const maxSize = 80;
+            const scale = Math.min(maxSize / photoElement.width, maxSize / photoElement.height);
+            photoElement.setScale(scale);
+        } else {
+            // Fallback: inicial C
+            photoElement = this.add.text(width - 100, photoY, 'C', {
+                fontSize: '48px',
+                fontFamily: 'Arial Black',
+                color: '#27ae60'
+            }).setOrigin(0.5);
+        }
+        photoElement.setAlpha(0);
+
+        // Titulo da heroina
+        const heroTitle = this.add.text(width - 100, photoY + 60, 'ECOHERO!', {
+            fontSize: '14px',
+            fontFamily: 'Arial Black',
+            color: '#f1c40f',
+            stroke: '#27ae60',
+            strokeThickness: 2
+        }).setOrigin(0.5);
+        heroTitle.setAlpha(0);
+
+        // Coroa de vitoria
+        const crown = this.add.text(width - 100, photoY - 55, '👑', {
+            fontSize: '28px'
+        }).setOrigin(0.5);
+        crown.setAlpha(0);
+
+        // Animacoes de entrada
+        this.tweens.add({
+            targets: [frame, photoElement, heroTitle, crown],
+            alpha: 1,
+            duration: 500,
+            delay: 400
+        });
+
+        // Brilho na moldura
+        this.tweens.add({
+            targets: frame,
+            scale: 1.05,
+            duration: 800,
+            yoyo: true,
+            repeat: -1,
+            delay: 1000
+        });
+
+        // Coroa a flutuar
+        this.tweens.add({
+            targets: crown,
+            y: photoY - 60,
+            duration: 1000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+            delay: 1000
         });
     }
 
@@ -171,7 +244,7 @@ export default class VictoryScene extends Phaser.Scene {
     }
 
     createBossMessage(width) {
-        const bossMessage = this.add.text(width / 2, 150, 'O Doutor Plastico foi derrotado!', {
+        const bossMessage = this.add.text(width / 2, 150, 'O Ricardo foi derrotado! Os ACs estao salvos! ❄️', {
             fontSize: '16px',
             fontFamily: 'Arial',
             color: '#e74c3c',
@@ -185,6 +258,23 @@ export default class VictoryScene extends Phaser.Scene {
             alpha: 1,
             duration: 500,
             delay: 1000
+        });
+
+        // Mensagem extra engracada
+        const funnyMsg = this.add.text(width / 2, 168, 'Agora ele pode vestir as 6 camadas em paz!', {
+            fontSize: '12px',
+            fontFamily: 'Arial',
+            color: '#9b59b6',
+            fontStyle: 'italic'
+        });
+        funnyMsg.setOrigin(0.5);
+        funnyMsg.setAlpha(0);
+
+        this.tweens.add({
+            targets: funnyMsg,
+            alpha: 1,
+            duration: 500,
+            delay: 1200
         });
     }
 

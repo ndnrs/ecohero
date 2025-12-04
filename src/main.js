@@ -6,6 +6,7 @@
 
 import Phaser from 'phaser';
 import BootScene from './scenes/BootScene.js';
+import IntroScene from './scenes/IntroScene.js';
 import MenuScene from './scenes/MenuScene.js';
 import Level1Scene from './scenes/Level1Scene.js';
 import Level2Scene from './scenes/Level2Scene.js';
@@ -39,6 +40,7 @@ const config = {
     // Array de todas as cenas do jogo
     scene: [
         BootScene,
+        IntroScene,
         MenuScene,
         Level1Scene,
         Level2Scene,

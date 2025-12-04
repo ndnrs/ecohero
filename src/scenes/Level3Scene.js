@@ -117,9 +117,9 @@ export default class Level3Scene extends Phaser.Scene {
         // Criar barra de vida do boss
         this.createBossHealthBar(width);
 
-        // Nome do boss
-        this.bossNameText = this.add.text(width / 2, 15, 'DOUTOR PLASTICO', {
-            fontSize: '18px',
+        // Nome do boss - Ricardo Gois!
+        this.bossNameText = this.add.text(width / 2, 15, 'RICARDO GOIS - O Vilao das 6 Camadas', {
+            fontSize: '16px',
             fontFamily: 'Arial',
             color: '#e74c3c',
             fontStyle: 'bold',
@@ -187,11 +187,15 @@ export default class Level3Scene extends Phaser.Scene {
     }
 
     createGroups() {
-        // Grupo para projeteis do boss
+        // Grupo para projeteis do boss (precisa de fisica para cair)
         this.trashProjectiles = this.physics.add.group();
 
         // Grupo para coletaveis gerados pelo boss
-        this.bossCollectibles = this.physics.add.group();
+        // Usa dynamic bodies com allowGravity=false e moves=false
+        this.bossCollectibles = this.physics.add.group({
+            allowGravity: false,
+            immovable: true
+        });
     }
 
     showBossIntro(width, height) {
@@ -199,7 +203,7 @@ export default class Level3Scene extends Phaser.Scene {
         const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.5);
 
         const introText = this.add.text(width / 2, height / 2 - 60,
-            'ALERTA!\nDoutor Plastico apareceu!', {
+            'ALERTA!\nRicardo Gois apareceu!', {
             fontSize: '28px',
             fontFamily: 'Arial',
             color: '#e74c3c',
@@ -210,7 +214,7 @@ export default class Level3Scene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         const tipText = this.add.text(width / 2, height / 2 + 20,
-            'Apanha o lixo que ele atira!\nCada item apanhado causa dano!', {
+            'Ele quer destruir os ACs!\nApanha o lixo para o derrotar!', {
             fontSize: '16px',
             fontFamily: 'Arial',
             color: '#f1c40f',
@@ -218,7 +222,7 @@ export default class Level3Scene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         const carlaText = this.add.text(width / 2, height / 2 + 70,
-            'Vamos Carla! Tu consegues! 💪', {
+            'Vamos Carla! Mostra-lhe o poder do vento frio! 🌬️', {
             fontSize: '18px',
             fontFamily: 'Arial',
             color: '#2ecc71',
@@ -266,6 +270,12 @@ export default class Level3Scene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.bossCollectibles, (player, item) => {
             this.handleCollectItem(player, item);
         });
+
+        // Coletaveis com plataformas - para ficarem no chao apos transformacao
+        this.physics.add.collider(this.bossCollectibles, this.platforms);
+
+        // NOTA: Trash NAO colide com plataformas - cai ate ao chao
+        // A transformacao e feita no update() baseada na posicao Y
     }
 
     handleTrashHit(player, trash) {
@@ -377,13 +387,16 @@ export default class Level3Scene extends Phaser.Scene {
             strokeThickness: 2
         }).setOrigin(0.5);
 
-        this.tweens.add({
-            targets: text,
-            y: text.y - 20,
-            alpha: 0,
-            duration: 1500,
-            ease: 'Power2',
-            onComplete: () => text.destroy()
+        // Ficar visivel por 2 segundos antes de desaparecer
+        this.time.delayedCall(2000, () => {
+            this.tweens.add({
+                targets: text,
+                y: text.y - 20,
+                alpha: 0,
+                duration: 800,
+                ease: 'Power2',
+                onComplete: () => text.destroy()
+            });
         });
     }
 
@@ -442,10 +455,22 @@ export default class Level3Scene extends Phaser.Scene {
             this.handlePlayerFall();
         }
 
-        // Limpar projeteis fora do ecra
-        this.trashProjectiles.getChildren().forEach(p => {
-            if (p && p.active && (p.x < -50 || p.x > 850 || p.y > 500)) {
-                p.destroy();
+        // Verificar trash que atingiu o chao (perto da plataforma inferior)
+        const groundY = this.cameras.main.height - 50;
+        this.trashProjectiles.getChildren().forEach(trash => {
+            if (trash && trash.active) {
+                // Transformar em coletavel quando atinge o chao
+                if (trash.y >= groundY) {
+                    if (this.boss && !this.boss.isDefeated) {
+                        this.boss.transformToCollectible(trash);
+                    } else {
+                        trash.destroy();
+                    }
+                }
+                // Limpar projeteis fora do ecra
+                else if (trash.x < -50 || trash.x > 850 || trash.y > 550) {
+                    trash.destroy();
+                }
             }
         });
     }
