@@ -20,6 +20,11 @@ export default class Level3Scene extends Phaser.Scene {
     create() {
         // Resetar flag de transicao
         this.transitioning = false;
+        this.bossDefeated = false;
+
+        // Sistema anti-sobreposicao de mensagens
+        this.isShowingMotivational = false;
+        this.currentMotivationalText = null;
 
         gameState.currentLevel = 3;
 
@@ -37,6 +42,7 @@ export default class Level3Scene extends Phaser.Scene {
         this.createPlayer();
         this.createControls();
         this.hud = new HUD(this);
+        this.hud.hideBossConflicts(); // Esconder elementos que conflitam com UI do boss
         this.createBoss(width, height);
         this.createGroups();
         this.setupCollisions();
@@ -118,8 +124,8 @@ export default class Level3Scene extends Phaser.Scene {
         this.createBossHealthBar(width);
 
         // Nome do boss - Ricardo Gois!
-        this.bossNameText = this.add.text(width / 2, 15, 'RICARDO GOIS - O Vilao das 6 Camadas', {
-            fontSize: '16px',
+        this.bossNameText = this.add.text(width / 2, 10, 'RICARDO GOIS - O Vilao das 6 Camadas', {
+            fontSize: '14px',
             fontFamily: 'Arial',
             color: '#e74c3c',
             fontStyle: 'bold',
@@ -139,7 +145,7 @@ export default class Level3Scene extends Phaser.Scene {
         const barWidth = 250;
         const barHeight = 18;
         const x = width / 2;
-        const y = 38;
+        const y = 28;
 
         // Fundo da barra
         this.bossHealthBg = this.add.rectangle(x, y, barWidth, barHeight, 0x2c3e50);
@@ -366,6 +372,15 @@ export default class Level3Scene extends Phaser.Scene {
     }
 
     showMotivationalMessage() {
+        // Sistema anti-sobreposicao: ignorar se ja esta a mostrar
+        if (this.isShowingMotivational) return;
+        this.isShowingMotivational = true;
+
+        // Destruir mensagem anterior se existir
+        if (this.currentMotivationalText && this.currentMotivationalText.active) {
+            this.currentMotivationalText.destroy();
+        }
+
         const messages = [
             'Boa Carla! 🌱',
             'Continua assim!',
@@ -378,7 +393,7 @@ export default class Level3Scene extends Phaser.Scene {
         const message = Phaser.Utils.Array.GetRandom(messages);
         const width = this.cameras.main.width;
 
-        const text = this.add.text(width / 2, 120, message, {
+        this.currentMotivationalText = this.add.text(width / 2, 120, message, {
             fontSize: '20px',
             fontFamily: 'Arial',
             color: '#2ecc71',
@@ -389,36 +404,59 @@ export default class Level3Scene extends Phaser.Scene {
 
         // Ficar visivel por 2 segundos antes de desaparecer
         this.time.delayedCall(2000, () => {
+            if (!this.currentMotivationalText || !this.currentMotivationalText.active) {
+                this.isShowingMotivational = false;
+                return;
+            }
+
             this.tweens.add({
-                targets: text,
-                y: text.y - 20,
+                targets: this.currentMotivationalText,
+                y: this.currentMotivationalText.y - 20,
                 alpha: 0,
                 duration: 800,
                 ease: 'Power2',
-                onComplete: () => text.destroy()
+                onComplete: () => {
+                    if (this.currentMotivationalText) {
+                        this.currentMotivationalText.destroy();
+                        this.currentMotivationalText = null;
+                    }
+                    this.isShowingMotivational = false;
+                }
             });
         });
     }
 
     handleBossDefeated() {
+        // Guard contra chamadas multiplas
+        if (this.bossDefeated) return;
+        this.bossDefeated = true;
+
         // Limpar projeteis e coletaveis restantes
         this.trashProjectiles.clear(true, true);
         this.bossCollectibles.clear(true, true);
 
-        // Esconder HUD do boss
-        this.tweens.add({
-            targets: [this.bossHealthBg, this.bossHealthBar, this.bossNameText, this.bossHPText],
-            alpha: 0,
-            duration: 500
-        });
-
-        // Esconder combo e itens do HUD (para nao sobrepor mensagem de vitoria)
-        if (this.hud?.elements) {
+        // Esconder HUD do boss com verificacao de existencia
+        const bossUITargets = [this.bossHealthBg, this.bossHealthBar, this.bossNameText, this.bossHPText]
+            .filter(t => t && t.active);
+        if (bossUITargets.length > 0) {
             this.tweens.add({
-                targets: [this.hud.elements.comboText, this.hud.elements.itemsText],
+                targets: bossUITargets,
                 alpha: 0,
                 duration: 500
             });
+        }
+
+        // Esconder combo e itens do HUD (para nao sobrepor mensagem de vitoria)
+        if (this.hud?.elements) {
+            const hudTargets = [this.hud.elements.comboText, this.hud.elements.itemsText]
+                .filter(t => t && t.active);
+            if (hudTargets.length > 0) {
+                this.tweens.add({
+                    targets: hudTargets,
+                    alpha: 0,
+                    duration: 500
+                });
+            }
         }
 
         // Transicao para Victory apos 3 segundos
@@ -502,9 +540,26 @@ export default class Level3Scene extends Phaser.Scene {
         if (this.transitioning) return;
         this.transitioning = true;
 
+        // Parar todos os timers e tweens pendentes
+        this.time.removeAllEvents();
+
+        // Parar comportamento do boss se ainda existir
+        if (this.boss) {
+            this.boss.isDefeated = true;
+            if (this.boss.attackTimer) this.boss.attackTimer.destroy();
+            if (this.boss.moveTimer) this.boss.moveTimer.destroy();
+        }
+
         this.cameras.main.fadeOut(1000);
         this.cameras.main.once('camerafadeoutcomplete', () => {
             this.scene.start('VictoryScene');
+        });
+
+        // Fallback de seguranca - se fadeOut nao completar em 1.5s, forcar transicao
+        this.time.delayedCall(1500, () => {
+            if (this.scene.isActive()) {
+                this.scene.start('VictoryScene');
+            }
         });
     }
 }

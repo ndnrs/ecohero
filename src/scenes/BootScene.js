@@ -19,6 +19,9 @@ export default class BootScene extends Phaser.Scene {
         // IMPORTANTE: Coloca as fotos em public/assets/images/
         this.load.image('carla-photo', '/assets/images/carla.jpg');
         this.load.image('ricardo-photo', '/assets/images/ricardo.jpeg');
+        this.load.image('carla-photo-2', '/assets/images/carla2.jpg');
+        this.load.image('ricardo-photo-2', '/assets/images/ricardo2.jpeg');
+        this.load.image('iscte-photo', '/assets/images/iscte.jpg');
 
         // Handler para erros de carregamento (fotos opcionais)
         this.load.on('loaderror', (file) => {

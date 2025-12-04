@@ -60,6 +60,7 @@ export default class IntroScene extends Phaser.Scene {
             // Slide 1: Introducao
             {
                 background: 0x2c3e50,
+                backgroundImage: 'iscte-photo',
                 title: 'Campus do ISCTE...',
                 subtitle: 'Um dia aparentemente normal',
                 character: null,
@@ -88,6 +89,7 @@ export default class IntroScene extends Phaser.Scene {
                 character: 'ricardo',
                 characterName: 'RICARDO GÓIS',
                 characterTitle: null,
+                photoVersion: 2,
                 dialogues: [
                     'Desliga o AC! Já estou com farfalheira!',
                     'Preciso das papas de linhaça para ter energia...'
@@ -102,6 +104,7 @@ export default class IntroScene extends Phaser.Scene {
                 character: 'ricardo',
                 characterName: 'RICARDO GÓIS',
                 characterTitle: null,
+                photoVersion: 2,
                 dialogues: [
                     'Odeio correntes de ar!',
                     'Este campus vai ARDER de calor! MUAHAHA!'
@@ -130,6 +133,7 @@ export default class IntroScene extends Phaser.Scene {
                 character: 'carla',
                 characterName: 'ECOHERO CARLA',
                 characterTitle: '🦸‍♀️ Super-Heroína da Sustentabilidade',
+                photoVersion: 2,
                 dialogues: [
                     'Está na hora de vestir o meu fato!',
                     'Pelo poder da sustentabilidade... TRANSFORMAR!'
@@ -145,6 +149,7 @@ export default class IntroScene extends Phaser.Scene {
                 character: 'carla',
                 characterName: 'ECOHERO CARLA',
                 characterTitle: null,
+                photoVersion: 2,
                 dialogues: [
                     'Vou-te tirar essa camisola para te constipares!',
                     'Vou-te esconder o desumidificador!'
@@ -159,6 +164,7 @@ export default class IntroScene extends Phaser.Scene {
                 character: 'carla',
                 characterName: null,
                 characterTitle: null,
+                photoVersion: 2,
                 dialogues: [],
                 showPlayButton: true
             }
@@ -176,6 +182,18 @@ export default class IntroScene extends Phaser.Scene {
         // Fundo do slide
         const bg = this.add.rectangle(width / 2, height / 2, width, height, slide.background);
         this.slideContainer.add(bg);
+
+        // Imagem de fundo se existir
+        if (slide.backgroundImage && this.textures.exists(slide.backgroundImage)) {
+            const bgImage = this.add.image(width / 2, height / 2, slide.backgroundImage);
+            // Ajustar para cobrir o ecra mantendo proporcao
+            const scaleX = width / bgImage.width;
+            const scaleY = height / bgImage.height;
+            const scale = Math.max(scaleX, scaleY);
+            bgImage.setScale(scale);
+            bgImage.setAlpha(0.4); // Semi-transparente para o texto ser legivel
+            this.slideContainer.add(bgImage);
+        }
 
         // Titulo se existir
         if (slide.title) {
@@ -246,7 +264,9 @@ export default class IntroScene extends Phaser.Scene {
         this.slideContainer.add(frame);
 
         // Tentar usar foto real, senao usar placeholder
-        const photoKey = isVillain ? 'ricardo-photo' : 'carla-photo';
+        // Usa foto 2 para slides com photoVersion: 2 (apos transformacao)
+        const photoSuffix = slide.photoVersion === 2 ? '-2' : '';
+        const photoKey = isVillain ? `ricardo-photo${photoSuffix}` : `carla-photo${photoSuffix}`;
 
         if (this.textures.exists(photoKey)) {
             const photo = this.add.image(charX, charY, photoKey);

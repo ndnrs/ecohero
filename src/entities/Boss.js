@@ -61,13 +61,21 @@ export default class Boss extends Phaser.GameObjects.Container {
         photoFrame.setStrokeStyle(4, 0xe74c3c);
         this.add(photoFrame);
 
-        // Tentar usar foto real do Ricardo
-        if (this.scene.textures.exists('ricardo-photo')) {
-            const photo = this.scene.add.image(0, -25, 'ricardo-photo');
-            // Ajustar escala para caber na moldura
+        // Tentar usar foto real do Ricardo (foto 2 - versao vilao)
+        if (this.scene.textures.exists('ricardo-photo-2')) {
+            const photo = this.scene.add.image(0, -25, 'ricardo-photo-2');
+            photo.setOrigin(0.5); // Centrar na moldura
+            // Ajustar escala para PREENCHER a moldura (cover, nao contain)
             const maxSize = 60;
-            const scale = Math.min(maxSize / photo.width, maxSize / photo.height);
+            const scale = Math.max(maxSize / photo.width, maxSize / photo.height);
             photo.setScale(scale);
+
+            // Criar mascara retangular para cortar o excesso
+            const maskGraphics = this.scene.make.graphics();
+            maskGraphics.fillStyle(0xffffff);
+            maskGraphics.fillRect(-30, -55, 60, 60); // Centrado em (0, -25)
+            photo.setMask(maskGraphics.createGeometryMask());
+
             this.add(photo);
             this.photoSprite = photo;
         } else {

@@ -13,6 +13,10 @@ export default class HUD {
         this.hearts = [];
         this.elements = {};
 
+        // Sistema anti-sobreposicao de mensagens
+        this.currentMotivationalText = null;
+        this.isShowingMotivational = false;
+
         // Criar HUD
         this.create();
     }
@@ -232,9 +236,18 @@ export default class HUD {
     }
 
     /**
-     * Mostrar mensagem motivacional
+     * Mostrar mensagem motivacional (com sistema anti-sobreposicao)
      */
     showMotivationalMessage() {
+        // Ignorar se ja esta a mostrar uma mensagem
+        if (this.isShowingMotivational) return;
+        this.isShowingMotivational = true;
+
+        // Destruir mensagem anterior se existir
+        if (this.currentMotivationalText && this.currentMotivationalText.active) {
+            this.currentMotivationalText.destroy();
+        }
+
         const messages = [
             'Boa Carla! 🌱',
             'O planeta agradece!',
@@ -248,28 +261,50 @@ export default class HUD {
         const msg = Phaser.Utils.Array.GetRandom(messages);
         const width = this.scene.cameras.main.width;
 
-        const msgText = this.scene.add.text(width / 2, 120, msg, {
+        this.currentMotivationalText = this.scene.add.text(width / 2, 120, msg, {
             fontSize: '24px',
             fontFamily: 'Arial',
             color: '#2ecc71',
             stroke: '#000000',
             strokeThickness: 3
         });
-        msgText.setOrigin(0.5);
-        msgText.setScrollFactor(0);
-        msgText.setDepth(200);
+        this.currentMotivationalText.setOrigin(0.5);
+        this.currentMotivationalText.setScrollFactor(0);
+        this.currentMotivationalText.setDepth(200);
 
         // Ficar visivel por 2 segundos antes de comecar a desaparecer
         this.scene.time.delayedCall(2000, () => {
+            if (!this.currentMotivationalText || !this.currentMotivationalText.active) {
+                this.isShowingMotivational = false;
+                return;
+            }
+
             this.scene.tweens.add({
-                targets: msgText,
+                targets: this.currentMotivationalText,
                 y: 100,
                 alpha: 0,
                 duration: 800,
                 ease: 'Power2',
-                onComplete: () => msgText.destroy()
+                onComplete: () => {
+                    if (this.currentMotivationalText) {
+                        this.currentMotivationalText.destroy();
+                        this.currentMotivationalText = null;
+                    }
+                    this.isShowingMotivational = false;
+                }
             });
         });
+    }
+
+    /**
+     * Esconder elementos que conflitam com o UI do boss (Level 3)
+     */
+    hideBossConflicts() {
+        // Esconder levelText e itemsText no boss fight
+        this.elements.levelText.setVisible(false);
+        this.elements.itemsText.setVisible(false);
+        // Mover combo para mais baixo para nao sobrepor a barra do boss
+        this.elements.comboText.setY(50);
     }
 
     /**
