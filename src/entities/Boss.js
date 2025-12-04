@@ -189,12 +189,12 @@ export default class Boss extends Phaser.GameObjects.Container {
         // Frases engracadas do Ricardo durante a luta
         const phrases = [
             'Desliga o AC!',
-            'Ja estou com farfalheira!',
+            'Ja estou com farfalheira! AAAAHHHH',
             'Preciso das papas de linhaca!',
             'Odeio correntes de ar!',
             'Esta demasiado frio aqui!',
-            'Quero o meu desumidificador!',
-            'Vou vestir mais uma camada!'
+            'Quero o meu umidificador!',
+            'Vou vestir mais uma camada de roupa!'
         ];
 
         // Frase especial na fase 3

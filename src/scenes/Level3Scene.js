@@ -134,7 +134,7 @@ export default class Level3Scene extends Phaser.Scene {
         this.createBossHealthBar(width);
 
         // Nome do boss - Ricardo Gois!
-        this.bossNameText = this.add.text(width / 2, 10, 'RICARDO GOIS - O Vilao das 6 Camadas', {
+        this.bossNameText = this.add.text(width / 2, 10, 'RICARDO GOIS - O Vilao das 6 Camadas de roupa', {
             fontSize: '14px',
             fontFamily: 'Arial',
             color: '#e74c3c',

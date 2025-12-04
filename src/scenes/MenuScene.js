@@ -53,7 +53,7 @@ export default class MenuScene extends Phaser.Scene {
         christmasEmoji.setOrigin(0.5);
 
         // Descricao do jogo
-        const description = this.add.text(width / 2, 190, 'Salva o campus da poluicao!', {
+        const description = this.add.text(width / 2, 190, 'Salva o campus da poluicao e torna mais verde o iscte!', {
             fontSize: '18px',
             fontFamily: 'Arial',
             color: '#ecf0f1'
@@ -72,7 +72,7 @@ export default class MenuScene extends Phaser.Scene {
         instructions.setOrigin(0.5);
 
         // Creditos
-        const credits = this.add.text(width / 2, height - 25, 'Feito com ❤️ e IA', {
+        const credits = this.add.text(width / 2, height - 25, 'Dezembro 2025', {
             fontSize: '12px',
             fontFamily: 'Arial',
             color: '#7f8c8d'

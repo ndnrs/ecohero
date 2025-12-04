@@ -32,7 +32,7 @@ export default class GameOverScene extends Phaser.Scene {
         this.createSadParticles(width, height);
 
         // Titulo Game Over com animacao
-        const title = this.add.text(width / 2, -50, 'Oh nao! O lixo venceu...', {
+        const title = this.add.text(width / 2, -50, 'Oh nao! Não consegui reciclar...o lixo venceu', {
             fontSize: '32px',
             fontFamily: 'Arial',
             color: '#e74c3c',

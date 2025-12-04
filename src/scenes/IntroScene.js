@@ -62,7 +62,7 @@ export default class IntroScene extends Phaser.Scene {
                 background: 0x2c3e50,
                 backgroundImage: 'iscte-photo',
                 title: 'Campus do ISCTE...',
-                subtitle: 'Um dia aparentemente normal',
+                subtitle: 'Um dia aparentemente normal numa tarde de sol...',
                 character: null,
                 dialogues: []
             },
@@ -73,11 +73,11 @@ export default class IntroScene extends Phaser.Scene {
                 title: null,
                 subtitle: null,
                 character: 'ricardo',
-                characterName: 'RICARDO GÓIS',
-                characterTitle: '🦹 O Vilão das 6 Camadas',
+                characterName: 'SOTOR',
+                characterTitle: '🦹 O Vilão das 6 Camadas de roupa',
                 dialogues: [
-                    'HAHAHA! Finalmente chegou o meu momento!',
-                    'Vou destruir TODOS os ares condicionados do ISCTE!'
+                    'HAHAHAHA! Finalmente chegou o meu momento!',
+                    'Vou destruir TODOS os ares condicionados do ISCTE! AHAHAH'
                 ]
             },
 
@@ -87,11 +87,11 @@ export default class IntroScene extends Phaser.Scene {
                 title: null,
                 subtitle: null,
                 character: 'ricardo',
-                characterName: 'RICARDO GÓIS',
+                characterName: 'SOTOR',
                 characterTitle: null,
                 photoVersion: 2,
                 dialogues: [
-                    'Desliga o AC! Já estou com farfalheira!',
+                    'Desliga o AC! Já estou com farfalheira! (a fazer os movimentos com as mãos no peito)',
                     'Preciso das papas de linhaça para ter energia...'
                 ]
             },
@@ -102,12 +102,12 @@ export default class IntroScene extends Phaser.Scene {
                 title: null,
                 subtitle: null,
                 character: 'ricardo',
-                characterName: 'RICARDO GÓIS',
+                characterName: 'SOTOR',
                 characterTitle: null,
                 photoVersion: 2,
                 dialogues: [
                     'Odeio correntes de ar!',
-                    'Este campus vai ARDER de calor! MUAHAHA!'
+                    'Este campus vai ARDER de calor! MUUAHAHA!'
                 ]
             },
 
@@ -120,8 +120,8 @@ export default class IntroScene extends Phaser.Scene {
                 characterName: 'CARLA FARELO',
                 characterTitle: '♻️ Coordenadora da Sustentabilidade',
                 dialogues: [
-                    'O QUÊ?! O Ricardo quer destruir os ACs?!',
-                    'Isto não pode acontecer!'
+                    'O QUÊ?! O Sotor quer destruir os ACs?!',
+                    'Isto não pode acontecer! Está na HORA da ECO-HERO entrar em ação'
                 ]
             },
 
@@ -131,12 +131,12 @@ export default class IntroScene extends Phaser.Scene {
                 title: '⚡ TRANSFORMAÇÃO ⚡',
                 subtitle: null,
                 character: 'carla',
-                characterName: 'ECOHERO CARLA',
+                characterName: 'ECO-HERO CARLA',
                 characterTitle: '🦸‍♀️ Super-Heroína da Sustentabilidade',
                 photoVersion: 2,
                 dialogues: [
                     'Está na hora de vestir o meu fato!',
-                    'Pelo poder da sustentabilidade... TRANSFORMAR!'
+                    'Pelo poder da sustentabilidade... TRANSFORMAAAAAR!'
                 ],
                 showHeroSuit: true
             },
@@ -147,12 +147,12 @@ export default class IntroScene extends Phaser.Scene {
                 title: null,
                 subtitle: null,
                 character: 'carla',
-                characterName: 'ECOHERO CARLA',
+                characterName: 'ECO-HERO CARLA',
                 characterTitle: null,
                 photoVersion: 2,
                 dialogues: [
-                    'Vou-te tirar essa camisola para te constipares!',
-                    'Vou-te esconder o desumidificador!'
+                    'Vou arrancar-te essa camisola para te constipares!',
+                    'Vais ficar sem o teu umidificador!'
                 ]
             },
 
@@ -160,7 +160,7 @@ export default class IntroScene extends Phaser.Scene {
             {
                 background: 0x16a085,
                 title: '🌬️ COM O PODER DO VENTO FRIO 🌬️',
-                subtitle: 'EcoHero parte para a missão!',
+                subtitle: 'Super-heroina da Sustentabilidade parte para a missão!',
                 character: 'carla',
                 characterName: null,
                 characterTitle: null,

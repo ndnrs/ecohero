@@ -244,7 +244,7 @@ export default class VictoryScene extends Phaser.Scene {
     }
 
     createBossMessage(width) {
-        const bossMessage = this.add.text(width / 2, 150, 'O Ricardo foi derrotado! Os ACs estao salvos! ❄️', {
+        const bossMessage = this.add.text(width / 2, 150, 'O Monstro dos AC\'s foi derrotado! Os ACs estao todos salvos! ❄️', {
             fontSize: '16px',
             fontFamily: 'Arial',
             color: '#e74c3c',
@@ -261,7 +261,7 @@ export default class VictoryScene extends Phaser.Scene {
         });
 
         // Mensagem extra engracada
-        const funnyMsg = this.add.text(width / 2, 168, 'Agora ele pode vestir as 6 camadas em paz!', {
+        const funnyMsg = this.add.text(width / 2, 168, 'Agora ele pode vestir as suas 6 camadas de roupa em paz!', {
             fontSize: '12px',
             fontFamily: 'Arial',
             color: '#9b59b6',
