@@ -49,64 +49,97 @@ export default class AssetGenerator {
         const armOffset = frame === 1 ? -3 : (frame === 2 ? 3 : 0);
         const jumpSquish = frame === 3 ? 4 : 0;
 
-        // Capa verde (atras)
+        // Capa verde (atras) - heroina
         g.fillStyle(0x27ae60);
         g.fillRoundedRect(4, 12 - jumpSquish, 8, 28 + jumpSquish, 2);
 
-        // Pernas (calcas azuis escuras)
-        g.fillStyle(0x2c3e50);
+        // Pernas (leggings verdes escuras - estilo heroina)
+        g.fillStyle(0x1e8449);
         // Perna esquerda
         g.fillRect(10 + legOffset, 36, 5, 12);
         // Perna direita
         g.fillRect(17 - legOffset, 36, 5, 12);
 
-        // Sapatos verdes
-        g.fillStyle(0x27ae60);
-        g.fillRect(9 + legOffset, 44, 7, 4);
-        g.fillRect(16 - legOffset, 44, 7, 4);
+        // Botas verdes (estilo heroina)
+        g.fillStyle(0x145a32);
+        g.fillRect(9 + legOffset, 42, 7, 6);
+        g.fillRect(16 - legOffset, 42, 7, 6);
 
-        // Corpo (t-shirt verde clara)
+        // Corpo (fato verde com forma feminina)
         g.fillStyle(0x2ecc71);
         g.fillRoundedRect(8, 16 - jumpSquish, 16, 22 + jumpSquish, 3);
 
+        // Cinto dourado (detalhe heroina)
+        g.fillStyle(0xf1c40f);
+        g.fillRect(8, 32, 16, 3);
+
         // Simbolo reciclagem no peito
         g.fillStyle(0xffffff);
-        g.fillCircle(16, 26, 4);
-        g.fillStyle(0x2ecc71);
-        g.fillCircle(16, 26, 2);
+        g.fillCircle(16, 24, 4);
+        g.fillStyle(0x27ae60);
+        g.fillCircle(16, 24, 2);
 
-        // Bracos
+        // Bracos femininos (mais finos)
         g.fillStyle(0xf5cba7); // Pele
         // Braco esquerdo
-        g.fillRect(4 + armOffset, 18, 5, 12);
+        g.fillRect(5 + armOffset, 18, 4, 11);
         // Braco direito
-        g.fillRect(23 - armOffset, 18, 5, 12);
+        g.fillRect(23 - armOffset, 18, 4, 11);
 
-        // Cabeca
+        // Luvas verdes (estilo heroina)
+        g.fillStyle(0x27ae60);
+        g.fillRect(4 + armOffset, 26, 6, 4);
+        g.fillRect(22 - armOffset, 26, 6, 4);
+
+        // Cabeca feminina
         g.fillStyle(0xf5cba7);
         g.fillCircle(16, 8, 8);
 
-        // Cabelo castanho
+        // Cabelo castanho longo (estilo feminino - rabo de cavalo)
         g.fillStyle(0x8b4513);
-        g.fillRect(9, 0, 14, 6);
-        g.fillRect(8, 2, 3, 4);
-        g.fillRect(21, 2, 3, 4);
+        // Topo da cabeca
+        g.fillRect(9, 0, 14, 5);
+        // Laterais do cabelo
+        g.fillRect(8, 1, 3, 8);
+        g.fillRect(21, 1, 3, 8);
+        // Franja
+        g.fillRect(10, 0, 12, 3);
+        // Rabo de cavalo (atras)
+        g.fillRect(22, 4, 4, 14);
+        g.fillRect(24, 8, 3, 12);
 
-        // Olhos
+        // Olhos maiores (estilo feminino)
         g.fillStyle(0x2c3e50);
-        g.fillCircle(13, 7, 2);
-        g.fillCircle(19, 7, 2);
+        g.fillCircle(13, 7, 2.2);
+        g.fillCircle(19, 7, 2.2);
 
-        // Pupilas
+        // Pupilas brilhantes
         g.fillStyle(0xffffff);
-        g.fillCircle(13.5, 6.5, 0.8);
-        g.fillCircle(19.5, 6.5, 0.8);
+        g.fillCircle(13.5, 6.5, 1);
+        g.fillCircle(19.5, 6.5, 1);
 
-        // Sorriso
+        // Pestanas (detalhe feminino)
+        g.lineStyle(1, 0x2c3e50);
+        g.moveTo(11, 5);
+        g.lineTo(10, 4);
+        g.moveTo(15, 5);
+        g.lineTo(16, 4);
+        g.moveTo(17, 5);
+        g.lineTo(16, 4);
+        g.moveTo(21, 5);
+        g.lineTo(22, 4);
+        g.strokePath();
+
+        // Sorriso rosado
         g.lineStyle(1, 0xe74c3c);
         g.beginPath();
-        g.arc(16, 10, 3, 0.2, Math.PI - 0.2);
+        g.arc(16, 10, 2.5, 0.2, Math.PI - 0.2);
         g.strokePath();
+
+        // Bochechas rosadas
+        g.fillStyle(0xf8b4b4, 0.5);
+        g.fillCircle(10, 10, 2);
+        g.fillCircle(22, 10, 2);
 
         g.generateTexture(key, w, h);
         g.destroy();
@@ -408,29 +441,33 @@ export default class AssetGenerator {
         const g = this.scene.make.graphics({ x: 0, y: 0, add: false });
         const w = 32, h = 32;
 
-        // Corpo do saco
-        g.fillStyle(0xffffff, 0.8);
+        // Corpo do saco (cinza escuro para melhor contraste)
+        g.fillStyle(0x4a4a4a);
         g.fillRoundedRect(4, 8, 24, 20, 4);
 
-        // Asas do saco
-        g.fillStyle(0xffffff, 0.7);
+        // Borda preta para destaque
+        g.lineStyle(2, 0x1a1a1a);
+        g.strokeRoundedRect(4, 8, 24, 20, 4);
+
+        // Asas do saco (escuras)
+        g.fillStyle(0x3d3d3d);
         g.fillTriangle(8, 8, 4, 0, 12, 8);
         g.fillTriangle(24, 8, 28, 0, 20, 8);
 
-        // Vincos/dobras
-        g.lineStyle(1, 0xbdc3c7);
+        // Vincos/dobras (linhas escuras)
+        g.lineStyle(1, 0x2a2a2a);
         g.moveTo(10, 10);
         g.lineTo(14, 24);
         g.moveTo(22, 10);
         g.lineTo(18, 24);
         g.strokePath();
 
-        // Olhos maus
-        g.fillStyle(0xe74c3c);
+        // Olhos maus (vermelho brilhante para contraste)
+        g.fillStyle(0xff3333);
         g.fillCircle(12, 16, 3);
         g.fillCircle(20, 16, 3);
 
-        // Pupilas
+        // Pupilas pretas
         g.fillStyle(0x000000);
         g.fillCircle(13, 16, 1.5);
         g.fillCircle(21, 16, 1.5);
@@ -443,8 +480,8 @@ export default class AssetGenerator {
         const g = this.scene.make.graphics({ x: 0, y: 0, add: false });
         const w = 32, h = 32;
 
-        // Corpo do copo (trapezio)
-        g.fillStyle(0xffffff);
+        // Corpo do copo (trapezio - cinza escuro)
+        g.fillStyle(0x3d3d3d);
         g.beginPath();
         g.moveTo(8, 4);
         g.lineTo(24, 4);
@@ -453,21 +490,31 @@ export default class AssetGenerator {
         g.closePath();
         g.fillPath();
 
-        // Tampa
-        g.fillStyle(0x8b4513);
+        // Borda preta para destaque
+        g.lineStyle(2, 0x1a1a1a);
+        g.beginPath();
+        g.moveTo(8, 4);
+        g.lineTo(24, 4);
+        g.lineTo(22, 30);
+        g.lineTo(10, 30);
+        g.closePath();
+        g.strokePath();
+
+        // Tampa (preta)
+        g.fillStyle(0x2a2a2a);
         g.fillRect(6, 2, 20, 4);
 
-        // Mancha de cafe
-        g.fillStyle(0x5d4037, 0.5);
+        // Mancha de cafe escura
+        g.fillStyle(0x1a1a1a, 0.6);
         g.fillEllipse(16, 16, 10, 12);
 
-        // Olhos maus
-        g.fillStyle(0xe74c3c);
+        // Olhos maus (vermelho brilhante)
+        g.fillStyle(0xff3333);
         g.fillCircle(12, 14, 3);
         g.fillCircle(20, 14, 3);
 
-        // Sorriso mau
-        g.lineStyle(2, 0xe74c3c);
+        // Sorriso mau (vermelho)
+        g.lineStyle(2, 0xff3333);
         g.beginPath();
         g.arc(16, 22, 4, Math.PI, 0);
         g.strokePath();
@@ -480,26 +527,30 @@ export default class AssetGenerator {
         const g = this.scene.make.graphics({ x: 0, y: 0, add: false });
         const w = 32, h = 32;
 
-        // Corpo da beata
-        g.fillStyle(0xf5f5dc);
+        // Corpo da beata (cinza escuro)
+        g.fillStyle(0x4a4a4a);
         g.fillRect(6, 14, 16, 6);
 
-        // Filtro laranja
-        g.fillStyle(0xff9800);
+        // Borda preta
+        g.lineStyle(1, 0x1a1a1a);
+        g.strokeRect(6, 14, 16, 6);
+
+        // Filtro escuro (castanho muito escuro)
+        g.fillStyle(0x5d3a1a);
         g.fillRect(22, 14, 6, 6);
 
-        // Ponta queimada
-        g.fillStyle(0x424242);
+        // Ponta queimada (preta)
+        g.fillStyle(0x1a1a1a);
         g.fillRect(4, 14, 4, 6);
 
-        // Fumo
-        g.fillStyle(0x9e9e9e, 0.5);
+        // Fumo escuro
+        g.fillStyle(0x3d3d3d, 0.7);
         g.fillCircle(4, 10, 3);
         g.fillCircle(2, 6, 2);
         g.fillCircle(6, 4, 2);
 
-        // Olhos pequenos e maus
-        g.fillStyle(0xe74c3c);
+        // Olhos pequenos e maus (vermelho brilhante)
+        g.fillStyle(0xff3333);
         g.fillCircle(12, 16, 1.5);
         g.fillCircle(18, 16, 1.5);
 
@@ -511,29 +562,33 @@ export default class AssetGenerator {
         const g = this.scene.make.graphics({ x: 0, y: 0, add: false });
         const w = 32, h = 32;
 
-        // Corpo do barril
-        g.fillStyle(0x4caf50);
+        // Corpo do barril (preto/cinza muito escuro)
+        g.fillStyle(0x2a2a2a);
         g.fillRoundedRect(4, 4, 24, 26, 3);
 
-        // Aros metalicos
-        g.fillStyle(0x37474f);
+        // Borda preta
+        g.lineStyle(2, 0x0a0a0a);
+        g.strokeRoundedRect(4, 4, 24, 26, 3);
+
+        // Aros metalicos (pretos)
+        g.fillStyle(0x1a1a1a);
         g.fillRect(4, 8, 24, 3);
         g.fillRect(4, 22, 24, 3);
 
-        // Simbolo de perigo (caveira simplificada)
-        g.fillStyle(0x000000);
+        // Simbolo de perigo (caveira - amarelo para contraste)
+        g.fillStyle(0xf1c40f);
         g.fillCircle(16, 14, 5);
 
-        // Olhos da caveira
-        g.fillStyle(0x4caf50);
+        // Olhos da caveira (pretos)
+        g.fillStyle(0x0a0a0a);
         g.fillCircle(14, 13, 1.5);
         g.fillCircle(18, 13, 1.5);
 
-        // Boca
+        // Boca (preta)
         g.fillRect(13, 17, 6, 2);
 
-        // Brilho toxico
-        g.fillStyle(0x8bc34a, 0.5);
+        // Brilho toxico verde (para indicar perigo)
+        g.fillStyle(0x00ff00, 0.4);
         g.fillCircle(10, 10, 4);
 
         g.generateTexture('enemy-toxic', w, h);

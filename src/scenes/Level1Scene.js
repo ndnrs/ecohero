@@ -207,8 +207,8 @@ export default class Level1Scene extends Phaser.Scene {
         instructions.setOrigin(0.5);
         instructions.setAlpha(0.8);
 
-        // Desaparecer apos 3 segundos
-        this.time.delayedCall(3000, () => {
+        // Desaparecer apos 6 segundos (aumentado de 3s)
+        this.time.delayedCall(6000, () => {
             this.tweens.add({
                 targets: instructions,
                 alpha: 0,

@@ -143,8 +143,8 @@ export default class Level3Scene extends Phaser.Scene {
             strokeThickness: 2
         }).setOrigin(0.5);
 
-        // Iniciar comportamento do boss apos intro
-        this.time.delayedCall(3500, () => {
+        // Iniciar comportamento do boss apos intro (aumentado para 6.5s para coincidir com intro)
+        this.time.delayedCall(6500, () => {
             if (this.boss && !this.boss.isDefeated) {
                 this.boss.startBehavior();
             }
@@ -257,8 +257,8 @@ export default class Level3Scene extends Phaser.Scene {
             });
         });
 
-        // Fade out apos 3 segundos
-        this.time.delayedCall(3000, () => {
+        // Fade out apos 6 segundos (aumentado de 3s para dar mais tempo de ler)
+        this.time.delayedCall(6000, () => {
             this.tweens.add({
                 targets: [overlay, introText, tipText, carlaText],
                 alpha: 0,
@@ -416,8 +416,8 @@ export default class Level3Scene extends Phaser.Scene {
             strokeThickness: 2
         }).setOrigin(0.5);
 
-        // Ficar visivel por 2 segundos antes de desaparecer
-        this.time.delayedCall(2000, () => {
+        // Ficar visivel por 4 segundos antes de desaparecer (aumentado de 2s)
+        this.time.delayedCall(4000, () => {
             if (!this.currentMotivationalText || !this.currentMotivationalText.active) {
                 this.isShowingMotivational = false;
                 return;

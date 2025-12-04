@@ -225,13 +225,17 @@ export default class HUD {
         floatText.setOrigin(0.5);
         floatText.setDepth(200);
 
-        this.scene.tweens.add({
-            targets: floatText,
-            y: y - 50,
-            alpha: 0,
-            duration: 800,
-            ease: 'Power2',
-            onComplete: () => floatText.destroy()
+        // Tempo aumentado: ficar visivel por 1.5s antes de desaparecer
+        this.scene.time.delayedCall(1500, () => {
+            if (!floatText || !floatText.active) return;
+            this.scene.tweens.add({
+                targets: floatText,
+                y: y - 50,
+                alpha: 0,
+                duration: 800,
+                ease: 'Power2',
+                onComplete: () => floatText.destroy()
+            });
         });
     }
 
@@ -272,8 +276,8 @@ export default class HUD {
         this.currentMotivationalText.setScrollFactor(0);
         this.currentMotivationalText.setDepth(200);
 
-        // Ficar visivel por 2 segundos antes de comecar a desaparecer
-        this.scene.time.delayedCall(2000, () => {
+        // Ficar visivel por 4 segundos antes de comecar a desaparecer (aumentado de 2s)
+        this.scene.time.delayedCall(4000, () => {
             if (!this.currentMotivationalText || !this.currentMotivationalText.active) {
                 this.isShowingMotivational = false;
                 return;

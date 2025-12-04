@@ -245,8 +245,8 @@ export default class Boss extends Phaser.GameObjects.Container {
             delay: 100
         });
 
-        // Remover apos 3 segundos (mais tempo para ler)
-        this.scene.time.delayedCall(3000, () => {
+        // Remover apos 5 segundos (aumentado de 3s para dar mais tempo de ler)
+        this.scene.time.delayedCall(5000, () => {
             this.scene.tweens.add({
                 targets: [bubble, text],
                 alpha: 0,
@@ -530,7 +530,8 @@ export default class Boss extends Phaser.GameObjects.Container {
             duration: 300,
             ease: 'Back.easeOut',
             onComplete: () => {
-                this.scene.time.delayedCall(1500, () => {
+                // Aumentado de 1.5s para 4s para dar mais tempo de ler
+                this.scene.time.delayedCall(4000, () => {
                     this.scene.tweens.add({
                         targets: text,
                         alpha: 0,
@@ -641,8 +642,8 @@ export default class Boss extends Phaser.GameObjects.Container {
         // Mensagem de derrota (Y=100 para nao sobrepor HUD)
         const width = this.scene.cameras.main.width;
 
-        const defeatText = this.scene.add.text(width / 2, 100, 'RICARDO GOIS DERROTADO!', {
-            fontSize: '28px',
+        const defeatText = this.scene.add.text(width / 2, 100, 'MONSTRO FICOU COM FARFALHEIRA!', {
+            fontSize: '20px',
             fontFamily: 'Arial Black',
             color: '#2ecc71',
             stroke: '#000000',

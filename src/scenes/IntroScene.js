@@ -74,7 +74,8 @@ export default class IntroScene extends Phaser.Scene {
                 subtitle: null,
                 character: 'ricardo',
                 characterName: 'SOTOR',
-                characterTitle: '🦹 O Vilão das 6 Camadas de roupa',
+                characterEmoji: '🦹',
+                characterTitle: 'O Vilao das 6 Camadas de roupa',
                 dialogues: [
                     'HAHAHAHA! Finalmente chegou o meu momento!',
                     'Vou destruir TODOS os ares condicionados do ISCTE! AHAHAH'
@@ -88,11 +89,12 @@ export default class IntroScene extends Phaser.Scene {
                 subtitle: null,
                 character: 'ricardo',
                 characterName: 'SOTOR',
+                characterEmoji: '🦹',
                 characterTitle: null,
                 photoVersion: 2,
                 dialogues: [
-                    'Desliga o AC! Já estou com farfalheira! (a fazer os movimentos com as mãos no peito)',
-                    'Preciso das papas de linhaça para ter energia...'
+                    'Desliga o AC! Ja estou com farfalheira! (a fazer os movimentos com as maos no peito)',
+                    'Preciso das papas de linhaca para ter energia...'
                 ]
             },
 
@@ -103,6 +105,7 @@ export default class IntroScene extends Phaser.Scene {
                 subtitle: null,
                 character: 'ricardo',
                 characterName: 'SOTOR',
+                characterEmoji: '🦹',
                 characterTitle: null,
                 photoVersion: 2,
                 dialogues: [
@@ -118,6 +121,7 @@ export default class IntroScene extends Phaser.Scene {
                 subtitle: null,
                 character: 'carla',
                 characterName: 'CARLA FARELO',
+                characterEmoji: '🦸‍♀️',
                 characterTitle: '♻️ Coordenadora da Sustentabilidade',
                 dialogues: [
                     'O QUÊ?! O Sotor quer destruir os ACs?!',
@@ -132,6 +136,7 @@ export default class IntroScene extends Phaser.Scene {
                 subtitle: null,
                 character: 'carla',
                 characterName: 'ECO-HERO CARLA',
+                characterEmoji: '🦸‍♀️',
                 characterTitle: '🦸‍♀️ Super-Heroína da Sustentabilidade',
                 photoVersion: 2,
                 dialogues: [
@@ -148,6 +153,7 @@ export default class IntroScene extends Phaser.Scene {
                 subtitle: null,
                 character: 'carla',
                 characterName: 'ECO-HERO CARLA',
+                characterEmoji: '🦸‍♀️',
                 characterTitle: null,
                 photoVersion: 2,
                 dialogues: [
@@ -163,6 +169,7 @@ export default class IntroScene extends Phaser.Scene {
                 subtitle: 'Super-heroina da Sustentabilidade parte para a missão!',
                 character: 'carla',
                 characterName: null,
+                characterEmoji: '🦸‍♀️',
                 characterTitle: null,
                 photoVersion: 2,
                 dialogues: [],
@@ -257,9 +264,13 @@ export default class IntroScene extends Phaser.Scene {
         const charX = isVillain ? 150 : width - 150;
         const charY = height / 2 - 20;
 
+        // Tamanhos da moldura e foto (maiores para vilao)
+        const frameSize = isVillain ? 180 : 140;
+        const maxSize = isVillain ? 170 : 130;
+
         // Moldura colorida
         const frameColor = isVillain ? 0xe74c3c : 0x2ecc71;
-        const frame = this.add.rectangle(charX, charY, 140, 140, frameColor);
+        const frame = this.add.rectangle(charX, charY, frameSize, frameSize, frameColor);
         frame.setStrokeStyle(4, isVillain ? 0xc0392b : 0x27ae60);
         this.slideContainer.add(frame);
 
@@ -271,7 +282,6 @@ export default class IntroScene extends Phaser.Scene {
         if (this.textures.exists(photoKey)) {
             const photo = this.add.image(charX, charY, photoKey);
             // Ajustar escala para caber na moldura
-            const maxSize = 130;
             const scale = Math.min(maxSize / photo.width, maxSize / photo.height);
             photo.setScale(scale);
             this.slideContainer.add(photo);
@@ -286,10 +296,33 @@ export default class IntroScene extends Phaser.Scene {
             this.slideContainer.add(placeholder);
         }
 
+        // Offset para posicoes do nome e titulo (maior para vilao por causa da moldura maior)
+        const nameOffset = isVillain ? 110 : 90;
+        const titleOffset = isVillain ? 132 : 112;
+        const emojiOffset = isVillain ? -120 : -100;
+
+        // Emoji grande do personagem (acima do nome)
+        if (slide.characterEmoji) {
+            const emoji = this.add.text(charX, charY + emojiOffset, slide.characterEmoji, {
+                fontSize: '64px'
+            }).setOrigin(0.5);
+            this.slideContainer.add(emoji);
+
+            // Animacao bounce
+            this.tweens.add({
+                targets: emoji,
+                y: charY + emojiOffset - 10,
+                duration: 500,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
+        }
+
         // Nome do personagem
         if (slide.characterName) {
             const nameColor = isVillain ? '#e74c3c' : '#2ecc71';
-            const name = this.add.text(charX, charY + 90, slide.characterName, {
+            const name = this.add.text(charX, charY + nameOffset, slide.characterName, {
                 fontSize: '16px',
                 fontFamily: 'Arial Black',
                 color: nameColor,
@@ -301,7 +334,7 @@ export default class IntroScene extends Phaser.Scene {
 
         // Titulo do personagem
         if (slide.characterTitle) {
-            const title = this.add.text(charX, charY + 112, slide.characterTitle, {
+            const title = this.add.text(charX, charY + titleOffset, slide.characterTitle, {
                 fontSize: '12px',
                 fontFamily: 'Arial',
                 color: '#bdc3c7'
@@ -325,7 +358,7 @@ export default class IntroScene extends Phaser.Scene {
     }
 
     showHeroSuit(x, y) {
-        // Desenhar fato tipo Superman mas verde
+        // Desenhar fato tipo Superman mas verde (simplificado)
         const suit = this.add.container(x, y);
 
         // Corpo do fato
@@ -333,33 +366,17 @@ export default class IntroScene extends Phaser.Scene {
         body.setStrokeStyle(2, 0x1e8449);
         suit.add(body);
 
-        // Capa
-        const cape = this.add.triangle(0, 10, 0, -30, 35, 30, -35, 30, 0x145a32);
-        suit.add(cape);
-
-        // S de Sustentabilidade
-        const sLogo = this.add.text(0, 0, 'S', {
-            fontSize: '28px',
-            fontFamily: 'Arial Black',
-            color: '#f1c40f',
-            stroke: '#c0392b',
-            strokeThickness: 3
+        // Simbolo de reciclagem no peito (icone ecologico)
+        const recycleIcon = this.add.text(0, 0, '♻️', {
+            fontSize: '32px'
         }).setOrigin(0.5);
-        suit.add(sLogo);
-
-        // Texto explicativo
-        const label = this.add.text(0, 45, '(S de Sustentabilidade!)', {
-            fontSize: '10px',
-            fontFamily: 'Arial',
-            color: '#95a5a6'
-        }).setOrigin(0.5);
-        suit.add(label);
+        suit.add(recycleIcon);
 
         this.slideContainer.add(suit);
 
         // Animacao de brilho
         this.tweens.add({
-            targets: sLogo,
+            targets: recycleIcon,
             scale: 1.2,
             duration: 500,
             yoyo: true,
