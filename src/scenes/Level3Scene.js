@@ -21,6 +21,11 @@ export default class Level3Scene extends Phaser.Scene {
         // Resetar flag de transicao
         this.transitioning = false;
         this.bossDefeated = false;
+        this.victoryTransitionStarted = false;
+
+        // Referencia ao timer de vitoria (para evitar GC)
+        this.victoryTimer = null;
+        this.victoryFallbackTimer = null;
 
         // Sistema anti-sobreposicao de mensagens
         this.isShowingMotivational = false;
@@ -440,6 +445,8 @@ export default class Level3Scene extends Phaser.Scene {
         if (this.bossDefeated) return;
         this.bossDefeated = true;
 
+        console.log('[VICTORY] handleBossDefeated() called');
+
         // Limpar projeteis e coletaveis restantes
         this.trashProjectiles.clear(true, true);
         this.bossCollectibles.clear(true, true);
@@ -468,8 +475,29 @@ export default class Level3Scene extends Phaser.Scene {
             }
         }
 
-        // Transicao para Victory apos 3 segundos
-        this.time.delayedCall(3000, () => this.goToVictory());
+        // SISTEMA DE TRANSICAO ROBUSTO COM MULTIPLOS FALLBACKS
+        // Timer principal: 3 segundos para dar tempo a animacao do boss
+        this.victoryTimer = this.time.delayedCall(3000, () => {
+            console.log('[VICTORY] Primary timer triggered');
+            this.goToVictory();
+        });
+
+        // Fallback timer: 4 segundos caso o primeiro falhe
+        this.victoryFallbackTimer = this.time.delayedCall(4000, () => {
+            console.log('[VICTORY] Fallback timer triggered');
+            if (!this.victoryTransitionStarted) {
+                console.log('[VICTORY] Primary failed, using fallback');
+                this.goToVictory();
+            }
+        });
+
+        // Fallback FINAL absoluto: 5 segundos com transicao direta
+        this.time.delayedCall(5000, () => {
+            if (!this.victoryTransitionStarted) {
+                console.log('[VICTORY] EMERGENCY: Direct scene start');
+                this.scene.start('VictoryScene');
+            }
+        });
     }
 
     handlePlayerDamage() {
@@ -548,8 +576,25 @@ export default class Level3Scene extends Phaser.Scene {
     }
 
     goToVictory() {
-        if (this.transitioning) return;
+        // Guard: evitar multiplas transicoes
+        if (this.victoryTransitionStarted) {
+            console.log('[VICTORY] goToVictory() blocked - already started');
+            return;
+        }
+        this.victoryTransitionStarted = true;
         this.transitioning = true;
+
+        console.log('[VICTORY] goToVictory() executing transition');
+
+        // Cancelar timers de fallback (ja nao sao necessarios)
+        if (this.victoryTimer) {
+            this.victoryTimer.destroy();
+            this.victoryTimer = null;
+        }
+        if (this.victoryFallbackTimer) {
+            this.victoryFallbackTimer.destroy();
+            this.victoryFallbackTimer = null;
+        }
 
         // Parar comportamento do boss se ainda existir
         if (this.boss) {
@@ -558,12 +603,38 @@ export default class Level3Scene extends Phaser.Scene {
             if (this.boss.moveTimer) this.boss.moveTimer.destroy();
         }
 
-        // Fazer fadeOut (visual apenas)
-        this.cameras.main.fadeOut(1000);
+        // Parar o update loop de verificar trash (evita erros)
+        this.bossDefeated = true;
 
-        // Transicao garantida apos 1.5s (tempo do fadeOut + margem de seguranca)
-        this.time.delayedCall(1500, () => {
-            this.scene.start('VictoryScene');
+        // TRANSICAO DIRETA E SIMPLES - sem depender de camera events
+        // FadeOut visual (se falhar, nao importa)
+        try {
+            this.cameras.main.fadeOut(1000);
+        } catch (e) {
+            console.log('[VICTORY] Camera fadeOut failed, continuing anyway');
+        }
+
+        // Transicao garantida com timer simples
+        // Usar setTimeout nativo como backup ABSOLUTO do Phaser timer
+        const sceneRef = this.scene;
+
+        // Timer Phaser (primario)
+        this.time.delayedCall(1200, () => {
+            console.log('[VICTORY] Phaser timer - starting VictoryScene');
+            sceneRef.start('VictoryScene');
         });
+
+        // setTimeout nativo (fallback absoluto)
+        setTimeout(() => {
+            // Verificar se ainda nao transitou (scene ainda existe e esta ativa)
+            try {
+                if (sceneRef && sceneRef.scene && sceneRef.scene.key !== 'VictoryScene') {
+                    console.log('[VICTORY] Native setTimeout fallback - starting VictoryScene');
+                    sceneRef.start('VictoryScene');
+                }
+            } catch (e) {
+                // Ignorar erros se a cena ja foi destruida
+            }
+        }, 1500);
     }
 }

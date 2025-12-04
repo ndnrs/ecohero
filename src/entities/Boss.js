@@ -450,10 +450,16 @@ export default class Boss extends Phaser.GameObjects.Container {
     }
 
     takeDamage() {
-        if (this.isDefeated || this.isInvincible) return false;
+        // Guard: se ja foi derrotado, retorna true para indicar derrota
+        if (this.isDefeated) return true;
+
+        // Guard: se esta invencivel, nao toma dano
+        if (this.isInvincible) return false;
 
         this.isInvincible = true;
         this.health--;
+
+        console.log('[BOSS] takeDamage() - health now:', this.health);
 
         // Som de boss hit
         audioManager.playBossHit();
@@ -464,8 +470,12 @@ export default class Boss extends Phaser.GameObjects.Container {
         // Efeito visual de dano
         this.playHitAnimation();
 
-        // Camera shake
-        this.scene.cameras.main.shake(200, 0.015);
+        // Camera shake - curto para nao conflitar
+        try {
+            this.scene.cameras.main.shake(150, 0.012);
+        } catch (e) {
+            // Ignorar erro de camera
+        }
 
         // Texto de dano
         this.showDamageText();
@@ -478,9 +488,11 @@ export default class Boss extends Phaser.GameObjects.Container {
 
         // Recuperar apos 0.8 segundos
         this.scene.time.delayedCall(800, () => {
-            this.isInvincible = false;
-            if (this.sprite?.clearTint) {
-                this.sprite.clearTint();
+            if (!this.isDefeated) {
+                this.isInvincible = false;
+                if (this.sprite?.clearTint) {
+                    this.sprite.clearTint();
+                }
             }
         });
 
@@ -598,7 +610,11 @@ export default class Boss extends Phaser.GameObjects.Container {
     }
 
     defeat() {
+        // Guard contra chamadas multiplas
+        if (this.isDefeated) return;
         this.isDefeated = true;
+
+        console.log('[BOSS] defeat() called');
 
         // Limpar frases de batalha ativas (para nao sobrepor)
         if (this.activeBattlePhrases) {
@@ -612,12 +628,27 @@ export default class Boss extends Phaser.GameObjects.Container {
         // Som de derrota do boss
         audioManager.playBossDefeat();
 
-        // Parar timers
-        if (this.attackTimer) this.attackTimer.destroy();
-        if (this.moveTimer) this.moveTimer.destroy();
+        // Parar timers IMEDIATAMENTE
+        if (this.attackTimer) {
+            this.attackTimer.destroy();
+            this.attackTimer = null;
+        }
+        if (this.moveTimer) {
+            this.moveTimer.destroy();
+            this.moveTimer = null;
+        }
 
         // Parar todas as tweens neste objeto
         this.scene.tweens.killTweensOf(this);
+
+        // Parar tweens das particulas de aura
+        if (this.auraParticles) {
+            this.auraParticles.forEach(p => {
+                if (p && p.active) {
+                    this.scene.tweens.killTweensOf(p);
+                }
+            });
+        }
 
         // Mensagem de derrota (Y=100 para nao sobrepor HUD)
         const width = this.scene.cameras.main.width;
@@ -656,7 +687,8 @@ export default class Boss extends Phaser.GameObjects.Container {
         // Particulas de explosao verde
         this.createDefeatParticles();
 
-        // Animacao de derrota do boss
+        // Animacao de derrota do boss - SEM onComplete para destruir
+        // A destruicao sera gerida pelo scene quando transitar
         this.scene.tweens.add({
             targets: this,
             y: this.y + 300,
@@ -664,18 +696,22 @@ export default class Boss extends Phaser.GameObjects.Container {
             angle: 360,
             scale: 0.3,
             duration: 2000,
-            ease: 'Power2',
-            onComplete: () => {
-                this.destroy();
-            }
+            ease: 'Power2'
+            // REMOVIDO: onComplete que chamava this.destroy()
+            // O scene vai destruir tudo quando transitar para VictoryScene
         });
 
         // Bonus de pontuacao
         gameState.addScore(1000);
 
-        // Camera effects
-        this.scene.cameras.main.shake(500, 0.02);
-        this.scene.cameras.main.flash(500, 46, 204, 113);
+        // Camera effects - CURTOS para nao interferir com fadeOut posterior
+        // Shake curto e flash curto
+        try {
+            this.scene.cameras.main.shake(300, 0.015);
+            this.scene.cameras.main.flash(300, 46, 204, 113);
+        } catch (e) {
+            console.log('[BOSS] Camera effects failed, ignoring');
+        }
     }
 
     createDefeatParticles() {
