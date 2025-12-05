@@ -172,7 +172,7 @@ export default class IntroScene extends Phaser.Scene {
                 photoVersion: 2,
                 dialogues: [
                     'Vou arrancar-te essa camisola para te constipares!',
-                    'Vais ficar sem o teu umidificador!'
+                    'Vais ficar sem o teu humidificador!'
                 ],
                 musicTrack: 'intro-hero' // Continua musica heroica
             },

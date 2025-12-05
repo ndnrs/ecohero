@@ -193,7 +193,7 @@ export default class Boss extends Phaser.GameObjects.Container {
             'Preciso das papas de linhaca!',
             'Odeio correntes de ar!',
             'Esta demasiado frio aqui!',
-            'Quero o meu umidificador!',
+            'Quero o meu humidificador!',
             'Vou vestir mais uma camada de roupa!'
         ];
 
