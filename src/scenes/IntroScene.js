@@ -38,10 +38,19 @@ export default class IntroScene extends Phaser.Scene {
         // Mostrar primeiro slide
         this.showSlide(0);
 
-        // Input para avancar
-        this.input.on('pointerdown', () => this.nextSlide());
+        // Input para navegar
+        this.input.on('pointerdown', (pointer) => {
+            const backZoneWidth = width * 0.15;
+            if (pointer.x < backZoneWidth && this.currentSlide > 0) {
+                this.previousSlide();
+            } else {
+                this.nextSlide();
+            }
+        });
         this.input.keyboard.on('keydown-SPACE', () => this.nextSlide());
         this.input.keyboard.on('keydown-ENTER', () => this.nextSlide());
+        this.input.keyboard.on('keydown-LEFT', () => this.previousSlide());
+        this.input.keyboard.on('keydown-BACKSPACE', () => this.previousSlide());
 
         // Texto de instrucao
         this.skipText = this.add.text(width - 20, height - 20, 'Clica ou ESPAÇO para continuar...', {
@@ -73,7 +82,8 @@ export default class IntroScene extends Phaser.Scene {
                 subtitle: 'Um dia aparentemente normal numa tarde de sol...',
                 character: null,
                 dialogues: [],
-                musicTrack: 'intro' // Musica misteriosa inicial
+                musicTrack: 'intro', // Musica misteriosa inicial
+                overlayPhoto: 'ricardo-photo-3' // Foto do Ricardo no canto inferior esquerdo
             },
 
             // Slide 2: O Vilao aparece
@@ -260,6 +270,11 @@ export default class IntroScene extends Phaser.Scene {
             this.slideContainer.add(subtitle);
         }
 
+        // Foto overlay no canto inferior esquerdo (se existir)
+        if (slide.overlayPhoto && this.textures.exists(slide.overlayPhoto)) {
+            this.showOverlayPhoto(slide.overlayPhoto);
+        }
+
         // Personagem com foto
         if (slide.character) {
             this.showCharacter(slide);
@@ -273,6 +288,25 @@ export default class IntroScene extends Phaser.Scene {
         // Botao de jogar no ultimo slide
         if (slide.showPlayButton) {
             this.showPlayButton();
+        }
+
+        // Indicador subtil de navegacao para tras
+        if (index > 0) {
+            const backHint = this.add.text(15, height / 2, '<', {
+                fontSize: '24px',
+                fontFamily: 'Arial',
+                color: '#ffffff'
+            }).setOrigin(0, 0.5).setAlpha(0.15);
+            this.slideContainer.add(backHint);
+
+            this.tweens.add({
+                targets: backHint,
+                alpha: 0.25,
+                duration: 1500,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
         }
 
         // Indicador de slide
@@ -405,6 +439,31 @@ export default class IntroScene extends Phaser.Scene {
             duration: 500,
             yoyo: true,
             repeat: -1
+        });
+    }
+
+    showOverlayPhoto(photoKey) {
+        const height = this.cameras.main.height;
+
+        // Posicao no canto inferior esquerdo (encostado)
+        const maxSize = 200;
+
+        // Foto (sem moldura)
+        const photo = this.add.image(0, height, photoKey);
+        photo.setOrigin(0, 1); // Origem no canto inferior esquerdo
+        const scale = Math.min(maxSize / photo.width, maxSize / photo.height);
+        photo.setScale(scale);
+        this.slideContainer.add(photo);
+
+        // Animacao de entrada
+        photo.setScale(0);
+
+        this.tweens.add({
+            targets: photo,
+            scale: scale,
+            duration: 400,
+            delay: 300,
+            ease: 'Back.easeOut'
         });
     }
 
@@ -561,6 +620,21 @@ export default class IntroScene extends Phaser.Scene {
                 this.cameras.main.fadeIn(200);
             });
         }
+    }
+
+    previousSlide() {
+        if (this.currentSlide <= 0) {
+            return;
+        }
+
+        audioManager.resume();
+        this.currentSlide--;
+
+        this.cameras.main.fadeOut(200, 0, 0, 0);
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+            this.showSlide(this.currentSlide);
+            this.cameras.main.fadeIn(200);
+        });
     }
 
     startGame() {
