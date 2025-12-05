@@ -20,7 +20,9 @@ export default class VictoryScene extends Phaser.Scene {
         // Obter dados do jogo
         const data = gameState.getEndScreenData();
 
-        // Som de vitoria
+        // Iniciar musica de vitoria e som de vitoria
+        audioManager.init();
+        audioManager.playBGM('victory');
         audioManager.playVictory();
 
         // Fade in
@@ -477,6 +479,7 @@ export default class VictoryScene extends Phaser.Scene {
         // Botoes aparecem por ultimo
         this.time.delayedCall(3800, () => {
             this.createButton(width / 2 - 90, 420, '🔄 Jogar Novamente', () => {
+                audioManager.stopBGM(0.3);
                 this.cameras.main.fadeOut(500);
                 this.cameras.main.once('camerafadeoutcomplete', () => {
                     gameState.reset(); // Reiniciar estado do jogo
@@ -485,6 +488,7 @@ export default class VictoryScene extends Phaser.Scene {
             });
 
             this.createButton(width / 2 + 90, 420, '🏠 Menu', () => {
+                audioManager.stopBGM(0.3);
                 this.cameras.main.fadeOut(500);
                 this.cameras.main.once('camerafadeoutcomplete', () => {
                     gameState.reset(); // Reiniciar estado do jogo

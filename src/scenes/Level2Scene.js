@@ -10,6 +10,7 @@ import HUD from '../ui/HUD.js';
 import gameState from '../managers/GameState.js';
 import CollectibleManager from '../managers/CollectibleManager.js';
 import EnemyManager from '../managers/EnemyManager.js';
+import audioManager from '../managers/AudioManager.js';
 
 export default class Level2Scene extends Phaser.Scene {
     constructor() {
@@ -24,6 +25,10 @@ export default class Level2Scene extends Phaser.Scene {
 
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
+
+        // Iniciar musica de nivel 2 (mais intensa)
+        audioManager.init();
+        audioManager.playBGM('level2');
 
         this.cameras.main.fadeIn(500);
 

@@ -19,7 +19,9 @@ export default class GameOverScene extends Phaser.Scene {
         // Obter dados do jogo
         const data = gameState.getEndScreenData();
 
-        // Som de morte
+        // Iniciar musica de game over e som de morte
+        audioManager.init();
+        audioManager.playBGM('gameover');
         audioManager.playDeath();
 
         // Fade in
@@ -214,6 +216,7 @@ export default class GameOverScene extends Phaser.Scene {
         // Botoes (aparecem com delay)
         this.time.delayedCall(1800, () => {
             this.createButton(width / 2, 385, '🔄 Tentar Novamente', () => {
+                audioManager.stopBGM(0.3);
                 this.cameras.main.fadeOut(500);
                 this.cameras.main.once('camerafadeoutcomplete', () => {
                     gameState.reset(); // Reiniciar estado do jogo
@@ -222,6 +225,7 @@ export default class GameOverScene extends Phaser.Scene {
             });
 
             this.createButton(width / 2, 430, '🏠 Menu Principal', () => {
+                audioManager.stopBGM(0.3);
                 this.cameras.main.fadeOut(500);
                 this.cameras.main.once('camerafadeoutcomplete', () => {
                     gameState.reset(); // Reiniciar estado do jogo

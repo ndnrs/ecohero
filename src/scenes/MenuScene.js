@@ -15,6 +15,10 @@ export default class MenuScene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
 
+        // Inicializar audio e comecar musica de menu
+        audioManager.init();
+        audioManager.playBGM('menu');
+
         // Criar fundo com gradiente azul/verde
         this.createBackground(width, height);
 
@@ -145,8 +149,8 @@ export default class MenuScene extends Phaser.Scene {
         });
 
         buttonBg.on('pointerup', () => {
-            // Inicializar e tocar audio
-            audioManager.init();
+            // Parar musica de menu e tocar som de inicio
+            audioManager.stopBGM(0.3);
             audioManager.playGameStart();
 
             // Transicao para o primeiro nivel

@@ -47,6 +47,10 @@ export default class Level3Scene extends Phaser.Scene {
 
         this.cameras.main.fadeIn(500);
 
+        // Iniciar musica de boss epica
+        audioManager.init();
+        audioManager.playBGM('boss');
+
         this.createBackground(width, height);
         this.createPlatforms(width, height);
         this.createPlayer();
@@ -180,11 +184,13 @@ export default class Level3Scene extends Phaser.Scene {
         const maxWidth = 246;
         this.bossHealthBar.width = maxWidth * percent;
 
-        // Mudar cor conforme a vida
+        // Mudar cor conforme a vida e ajustar intensidade da musica
         if (percent <= 0.3) {
             this.bossHealthBar.fillColor = 0xe74c3c; // Vermelho
+            audioManager.setBGMIntensity(3); // Fase final - maxima intensidade
         } else if (percent <= 0.6) {
             this.bossHealthBar.fillColor = 0xf39c12; // Laranja
+            audioManager.setBGMIntensity(2); // Fase 2 - intensidade media
         } else {
             this.bossHealthBar.fillColor = 0x2ecc71; // Verde
         }
@@ -446,6 +452,9 @@ export default class Level3Scene extends Phaser.Scene {
         this.bossDefeated = true;
 
         console.log('[VICTORY] handleBossDefeated() called');
+
+        // Parar musica de boss
+        audioManager.stopBGM(0.5);
 
         // Limpar projeteis e coletaveis restantes
         this.trashProjectiles.clear(true, true);
