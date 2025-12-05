@@ -253,12 +253,11 @@ export default class HUD {
         }
 
         const messages = [
-            'Boa Carla! 🌱',
+            'Energia Positiva 🌱',
             'O planeta agradece!',
             'Reciclagem e vida!',
             'ISCTE mais verde!',
             'Eco-power! ♻️',
-            'Fantastico!',
             'Continua assim!'
         ];
 

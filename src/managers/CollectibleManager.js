@@ -159,10 +159,8 @@ export default class CollectibleManager {
                 this.scene.hud.showFloatingText(text, item.x, item.y);
                 this.scene.hud.animateScore();
 
-                // Mensagem motivacional ocasional
-                if (Math.random() < 0.3 || item.type === 'star') {
-                    this.scene.hud.showMotivationalMessage();
-                }
+                // Mensagem motivacional (sempre que apanha item)
+                this.scene.hud.showMotivationalMessage();
             }
 
             // Efeito no jogador

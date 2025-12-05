@@ -238,7 +238,7 @@ export default class Level3Scene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         const carlaText = this.add.text(width / 2, height / 2 + 70,
-            'Vamos Carla! Mostra-lhe o poder do vento frio! 🌬️', {
+            'Só a Super-Heroína da Sustentabilidade pode vencer! 🦸‍♀️', {
             fontSize: '18px',
             fontFamily: 'Arial',
             color: '#2ecc71',
