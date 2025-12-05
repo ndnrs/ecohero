@@ -288,6 +288,9 @@ export default class Level1Scene extends Phaser.Scene {
         if (this.transitioning) return;
         this.transitioning = true;
 
+        // Tocar som de nivel completo
+        audioManager.playLevelComplete();
+
         gameState.nextLevel();
 
         this.cameras.main.fadeOut(500);

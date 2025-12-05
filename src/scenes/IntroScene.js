@@ -15,6 +15,14 @@ export default class IntroScene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
 
+        // Inicializar audio e comecar musica de intro
+        // IMPORTANTE: A musica e iniciada uma vez e continua durante todas as transicoes de slides
+        audioManager.init();
+        audioManager.playBGM('intro');
+
+        // Track para musica atual (para mudar quando personagem muda)
+        this.currentMusicTrack = 'intro';
+
         // Fundo escuro
         this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a2e);
 
@@ -64,7 +72,8 @@ export default class IntroScene extends Phaser.Scene {
                 title: 'Campus do ISCTE...',
                 subtitle: 'Um dia aparentemente normal numa tarde de sol...',
                 character: null,
-                dialogues: []
+                dialogues: [],
+                musicTrack: 'intro' // Musica misteriosa inicial
             },
 
             // Slide 2: O Vilao aparece
@@ -79,7 +88,8 @@ export default class IntroScene extends Phaser.Scene {
                 dialogues: [
                     'HAHAHAHA! Finalmente chegou o meu momento!',
                     'Vou destruir TODOS os ares condicionados do ISCTE! AHAHAH'
-                ]
+                ],
+                musicTrack: 'intro-villain' // Musica ameacadora para o vilao
             },
 
             // Slide 3: Plano malvado
@@ -95,7 +105,8 @@ export default class IntroScene extends Phaser.Scene {
                 dialogues: [
                     'Desliga o AC! Ja estou com farfalheira! (a fazer os movimentos com as maos no peito)',
                     'Preciso das papas de linhaca para ter energia...'
-                ]
+                ],
+                musicTrack: 'intro-villain' // Continua musica do vilao
             },
 
             // Slide 4: Mais vilania
@@ -111,7 +122,8 @@ export default class IntroScene extends Phaser.Scene {
                 dialogues: [
                     'Odeio correntes de ar!',
                     'Este campus vai ARDER de calor! MUUAHAHA!'
-                ]
+                ],
+                musicTrack: 'intro-villain' // Continua musica do vilao
             },
 
             // Slide 5: A heroina descobre
@@ -126,7 +138,8 @@ export default class IntroScene extends Phaser.Scene {
                 dialogues: [
                     'O QUÊ?! O Sotor quer destruir os ACs?!',
                     'Isto não pode acontecer! Está na HORA da ECO-HERO entrar em ação'
-                ]
+                ],
+                musicTrack: 'intro-hero' // Musica heroica e esperancosa
             },
 
             // Slide 6: Transformacao
@@ -143,7 +156,8 @@ export default class IntroScene extends Phaser.Scene {
                     'Está na hora de vestir o meu fato!',
                     'Pelo poder da sustentabilidade... TRANSFORMAAAAAR!'
                 ],
-                showHeroSuit: true
+                showHeroSuit: true,
+                musicTrack: 'intro-hero' // Continua musica heroica
             },
 
             // Slide 7: Poderes e ameacas
@@ -159,7 +173,8 @@ export default class IntroScene extends Phaser.Scene {
                 dialogues: [
                     'Vou arrancar-te essa camisola para te constipares!',
                     'Vais ficar sem o teu umidificador!'
-                ]
+                ],
+                musicTrack: 'intro-hero' // Continua musica heroica
             },
 
             // Slide 8: Inicio da missao
@@ -173,7 +188,8 @@ export default class IntroScene extends Phaser.Scene {
                 characterTitle: null,
                 photoVersion: 2,
                 dialogues: [],
-                showPlayButton: true
+                showPlayButton: true,
+                musicTrack: 'intro-hero' // Continua musica heroica
             }
         ];
     }
@@ -185,6 +201,14 @@ export default class IntroScene extends Phaser.Scene {
         const slide = this.slides[index];
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
+
+        // Mudar musica APENAS se a track for diferente da atual
+        // Isto permite transicoes de slides suaves sem reiniciar a musica
+        if (slide.musicTrack && slide.musicTrack !== this.currentMusicTrack) {
+            // Crossfade suave para a nova musica
+            audioManager.crossfadeBGM(slide.musicTrack, 0.8);
+            this.currentMusicTrack = slide.musicTrack;
+        }
 
         // Fundo do slide
         const bg = this.add.rectangle(width / 2, height / 2, width, height, slide.background);
@@ -522,6 +546,9 @@ export default class IntroScene extends Phaser.Scene {
             return;
         }
 
+        // Garantir que o audio context esta ativo na primeira interacao
+        audioManager.resume();
+
         this.currentSlide++;
 
         if (this.currentSlide >= this.slides.length) {
@@ -537,8 +564,10 @@ export default class IntroScene extends Phaser.Scene {
     }
 
     startGame() {
-        // Iniciar audio
-        audioManager.init();
+        // Parar musica de intro com fade out
+        audioManager.stopBGM(0.3);
+
+        // Tocar som de inicio de jogo
         audioManager.playGameStart();
 
         // Transicao para o menu

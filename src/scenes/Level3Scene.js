@@ -47,10 +47,6 @@ export default class Level3Scene extends Phaser.Scene {
 
         this.cameras.main.fadeIn(500);
 
-        // Iniciar musica de boss epica
-        audioManager.init();
-        audioManager.playBGM('boss');
-
         this.createBackground(width, height);
         this.createPlatforms(width, height);
         this.createPlayer();
@@ -138,7 +134,7 @@ export default class Level3Scene extends Phaser.Scene {
         this.createBossHealthBar(width);
 
         // Nome do boss - Ricardo Gois!
-        this.bossNameText = this.add.text(width / 2, 10, 'RICARDO GOIS - O Vilao das 6 Camadas de roupa', {
+        this.bossNameText = this.add.text(width / 2, 10, 'Sotor - O Vilao das 6 Camadas de roupa', {
             fontSize: '14px',
             fontFamily: 'Arial',
             color: '#e74c3c',
@@ -184,13 +180,11 @@ export default class Level3Scene extends Phaser.Scene {
         const maxWidth = 246;
         this.bossHealthBar.width = maxWidth * percent;
 
-        // Mudar cor conforme a vida e ajustar intensidade da musica
+        // Mudar cor conforme a vida
         if (percent <= 0.3) {
             this.bossHealthBar.fillColor = 0xe74c3c; // Vermelho
-            audioManager.setBGMIntensity(3); // Fase final - maxima intensidade
         } else if (percent <= 0.6) {
             this.bossHealthBar.fillColor = 0xf39c12; // Laranja
-            audioManager.setBGMIntensity(2); // Fase 2 - intensidade media
         } else {
             this.bossHealthBar.fillColor = 0x2ecc71; // Verde
         }
@@ -225,7 +219,7 @@ export default class Level3Scene extends Phaser.Scene {
         const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.5);
 
         const introText = this.add.text(width / 2, height / 2 - 60,
-            'ALERTA!\nRicardo Gois apareceu!', {
+            'ALERTA!\nSotor TRANSFORMOU-SE!!', {
             fontSize: '28px',
             fontFamily: 'Arial',
             color: '#e74c3c',
@@ -452,9 +446,6 @@ export default class Level3Scene extends Phaser.Scene {
         this.bossDefeated = true;
 
         console.log('[VICTORY] handleBossDefeated() called');
-
-        // Parar musica de boss
-        audioManager.stopBGM(0.5);
 
         // Limpar projeteis e coletaveis restantes
         this.trashProjectiles.clear(true, true);

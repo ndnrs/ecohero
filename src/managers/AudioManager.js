@@ -149,11 +149,11 @@ class AudioManager {
         // Parar musica atual
         this.stopBGM(0.3);
 
-        // Aguardar fade out antes de iniciar nova
+        // Aguardar fade out + cleanup antes de iniciar nova (0.3 * 1000 + 50 + 50ms buffer = 400ms)
         setTimeout(() => {
             this.currentBGM = trackName;
             this.startBGMTrack(trackName, options);
-        }, 350);
+        }, 400);
     }
 
     /**
@@ -168,11 +168,11 @@ class AudioManager {
         // Fade out atual
         this.stopBGM(fadeTime);
 
-        // Iniciar nova apos fade
+        // Iniciar nova APOS o cleanup terminar (fadeTime * 1000 + 50 + 50ms buffer)
         setTimeout(() => {
             this.currentBGM = newTrack;
             this.startBGMTrack(newTrack, options);
-        }, fadeTime * 1000);
+        }, fadeTime * 1000 + 150);
     }
 
     /**

@@ -129,6 +129,9 @@ export default class PauseScene extends Phaser.Scene {
     }
 
     goToMenu() {
+        // Parar musica atual do nivel antes de ir para menu
+        audioManager.stopBGM(0.3);
+
         // Parar cena pausada e ir para menu
         this.scene.stop(this.pausedScene);
         this.scene.start('MenuScene');

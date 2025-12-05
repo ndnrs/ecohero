@@ -165,6 +165,10 @@ export default class Level2Scene extends Phaser.Scene {
     goToNextLevel() {
         if (this.transitioning) return;
         this.transitioning = true;
+
+        // Tocar som de nivel completo
+        audioManager.playLevelComplete();
+
         gameState.nextLevel();
         this.cameras.main.fadeOut(500);
         this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Level3Scene'));

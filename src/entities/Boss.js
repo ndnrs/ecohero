@@ -651,7 +651,7 @@ export default class Boss extends Phaser.GameObjects.Container {
         }).setOrigin(0.5);
 
         // Frase engracada de derrota (Y=160 para maior espacamento)
-        const funnyDefeat = this.scene.add.text(width / 2, 160, 'Vou buscar o meu casaco...', {
+        const funnyDefeat = this.scene.add.text(width / 2, 160, 'Continua...', {
             fontSize: '22px',
             fontFamily: 'Arial',
             color: '#f1c40f',
