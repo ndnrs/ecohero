@@ -79,7 +79,7 @@ export default class IntroScene extends Phaser.Scene {
                 background: 0x2c3e50,
                 backgroundImage: 'iscte-photo',
                 title: 'Campus do ISCTE...',
-                subtitle: 'Um dia aparentemente normal numa tarde de sol...',
+                subtitle: 'Um dia aparentemente normal...\naté um vilão surgir com o humidificador debaixo do braço',
                 character: null,
                 dialogues: [],
                 musicTrack: 'intro', // Musica misteriosa inicial
@@ -260,12 +260,13 @@ export default class IntroScene extends Phaser.Scene {
 
         // Subtitulo se existir
         if (slide.subtitle) {
-            const subtitle = this.add.text(width / 2, 90, slide.subtitle, {
+            const subtitle = this.add.text(width / 2, 110, slide.subtitle, {
                 fontSize: '18px',
                 fontFamily: 'Arial',
                 color: '#ecf0f1',
                 stroke: '#000000',
-                strokeThickness: 2
+                strokeThickness: 2,
+                align: 'center'
             }).setOrigin(0.5);
             this.slideContainer.add(subtitle);
         }
@@ -446,7 +447,7 @@ export default class IntroScene extends Phaser.Scene {
         const height = this.cameras.main.height;
 
         // Posicao no canto inferior esquerdo (encostado)
-        const maxSize = 200;
+        const maxSize = 150;
 
         // Foto (sem moldura)
         const photo = this.add.image(0, height, photoKey);
