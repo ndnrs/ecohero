@@ -97,7 +97,7 @@ export default class IntroScene extends Phaser.Scene {
                 characterTitle: 'O Vilao das 6 Camadas de roupa',
                 dialogues: [
                     'HAHAHAHA! Finalmente chegou o meu momento!',
-                    'Vou destruir TODOS os ares condicionados do ISCTE! AHAHAH'
+                    'Vou destruir TODOS os ares condicionados do ISCTE! MUUAHAHA!'
                 ],
                 musicTrack: 'intro-villain' // Musica ameacadora para o vilao
             },

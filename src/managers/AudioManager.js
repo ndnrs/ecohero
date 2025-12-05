@@ -8,8 +8,8 @@ class AudioManager {
     constructor() {
         this.context = null;
         this.enabled = true;
-        this.volume = 0.3;
-        this.bgmVolume = 0.15;
+        this.volume = 0.6;
+        this.bgmVolume = 0.4;
         this.initialized = false;
 
         // BGM state
