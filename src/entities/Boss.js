@@ -62,8 +62,8 @@ export default class Boss extends Phaser.GameObjects.Container {
         this.add(photoFrame);
 
         // Tentar usar foto real do Ricardo (foto 2 - versao vilao)
-        if (this.scene.textures.exists('ricardo-photo-2')) {
-            const photo = this.scene.add.image(0, -25, 'ricardo-photo-2');
+        if (this.scene.textures.exists('ricardo-photo')) {
+            const photo = this.scene.add.image(0, -25, 'ricardo-photo');
             photo.setOrigin(0.5); // Centrar na moldura
             // Ajustar escala para caber na moldura
             const maxSize = 60;

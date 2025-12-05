@@ -246,7 +246,7 @@ export default class VictoryScene extends Phaser.Scene {
     }
 
     createBossMessage(width) {
-        const bossMessage = this.add.text(width / 2, 142, 'O Monstro dos AC\'s foi derrotado! Os ACs estao todos salvos! ❄️', {
+        const bossMessage = this.add.text(width / 2, 142, 'O Monstro sotor foi derrotado! Os ACs estão todos salvos ❄️', {
             fontSize: '16px',
             fontFamily: 'Arial',
             color: '#e74c3c',
